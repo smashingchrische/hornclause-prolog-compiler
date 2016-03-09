@@ -2,7 +2,6 @@
 #include "y.tab.h"
 %}
 %%
-:\- {return IMPLIES;}
 \. {return DOT;}
 , {return COMMA;}
 ( {return OPEN_PARA;}
@@ -10,8 +9,13 @@
 \[ {return OPEN_BRA;}
 \] {return CLOSE_BRA;}
 \| {return PIPE;}
+\+ {return PLUS;}
+- {return MINUS;}
+\* {return ASTERIX;}
+\: {return COLON;}
 < {return SMALLER;}
 > {return GREATER;}
+= {return EQUALS;}
 == {return EQUALS;}
 not {return NOT;}
 is {return IS;}
