@@ -14,7 +14,9 @@
 \* {return ASTERIX;}
 \: {return COLON;}
 < {return SMALLER;}
+=< {return SMALLER_EQUALS;}
 > {return GREATER;}
+>= {return GREATER EQUALS;}
 = {return EQUALS;}
 == {return EQUALS;}
 not {return NOT;}
