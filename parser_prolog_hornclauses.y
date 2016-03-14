@@ -15,29 +15,36 @@ void yyerror(char *message);
 
 %%
 
-S: S E
-|
+S: S E {printf("Congrats. You seem to have a clue about Horn clauses.");}
+|E {printf("Congrats. You seem to have a clue about Horn clauses.");};
 
-E: RULE
-| FACT
+E: RULE NEW_LINE_FEED
+| FACT NEW_LINE_FEED;
 
-RULE: 
+RULE: AR IMPLIES FACT_LIST;
 
-FACT: CONST_ID DOT;
-| CONST_ID OPEN_PARA ARG_LIST CLOSE_PARA DOT;
+FACT: AR DOT;
+
+AR: CONST_ID OPEN_PARA ARG_LIST CLOSE_PARA;
 
 ARG_LIST: ARG COMMA ARG_LIST
 | ARG;
+
+FACT_LIST: AR COM FACT_LIST
+|AR;
+
+LIST: OPEN_BRA HEAD_CONTENT REST_LIST;
+
+REST_LIST: PIPE A CLOSE_BRA
+| COMMA A CLOSE_BRA;
+
+HEAD_CONTENT: VAR_ID
+|FULL;
 
 ARG: CONST_ID
 |FULL
 |LIST;
 
-LIST: OPEN_BRA LIST_BODY CLOSE_BRA;
-
-LIST_BODY: HEAD PIPE TAIL
-|ARG_LIST
-|
 
 %%
 int main(int argc, char **argv) {
