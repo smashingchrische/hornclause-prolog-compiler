@@ -11,7 +11,7 @@ void yyerror(char *message);
 %token NEW_LINE_FEED
 
 %type <int1> FULL
-%type <strval> CONST_ID VAR_ID
+%type <str> CONST_ID VAR_ID
 
 %%
 

@@ -24,7 +24,7 @@ not {return NOT;}
 is {return IS;}
 \\== {return UNEQUALS;}
 [0-9]+ {sscanf(yytext, "%d", &yylval.int1); return FULL;}
-[a-z][(a-zA-Z)]* {strcpy(yylval.strval, YYText()); return CONST_ID;}
-[A-Z][(a-zA-Z)]* {strcpy(yylval.strval, YYText()); return VAR_ID;}
+[a-z][(a-zA-Z)]* {yylval.str = strdup(yytext); return CONST_ID;}
+[A-Z][(a-zA-Z)]* {yylval.str = strdup(yytext); return VAR_ID;}
 \n {return NEW_LINE_FEED;}
 . {printf("It seems that you have no clue about Horn Clauses."); }
