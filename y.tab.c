@@ -123,9 +123,9 @@ extern int yydebug;
     ASTERIX = 276,
     COLON = 277,
     NEW_LINE_FEED = 278,
-    VAR_ID = 279,
+    NUMBER = 279,
     CONST_ID = 280,
-    FULL = 281
+    VAR_ID = 281
   };
 #endif
 /* Tokens.  */
@@ -150,9 +150,9 @@ extern int yydebug;
 #define ASTERIX 276
 #define COLON 277
 #define NEW_LINE_FEED 278
-#define VAR_ID 279
+#define NUMBER 279
 #define CONST_ID 280
-#define FULL 281
+#define VAR_ID 281
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -161,8 +161,8 @@ union YYSTYPE
 {
 #line 5 "parser_prolog_hornclauses.y" /* yacc.c:355  */
 
-char[] str;
-int integer;
+char* str;
+int num;
 
 #line 168 "y.tab.c" /* yacc.c:355  */
 };
@@ -421,16 +421,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  8
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   26
+#define YYLAST   30
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  27
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  12
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  20
+#define YYNRULES  22
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  37
+#define YYNSTATES  40
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -479,9 +479,9 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    21,    21,    22,    24,    25,    27,    29,    31,    33,
-      34,    36,    37,    39,    41,    42,    44,    45,    47,    48,
-      49
+       0,    20,    20,    21,    23,    24,    26,    28,    30,    32,
+      33,    35,    36,    38,    40,    41,    43,    44,    45,    47,
+      48,    49,    50
 };
 #endif
 
@@ -494,8 +494,9 @@ static const char *const yytname[] =
   "EQUALS", "NOT", "IS", "UNEQUALS", "SMALLER", "SMALLER_EQUALS",
   "GREATER", "GREATER_EQUALS", "COMMA", "OPEN_PARA", "CLOSE_PARA",
   "OPEN_BRA", "CLOSE_BRA", "PIPE", "ASTERIX", "COLON", "NEW_LINE_FEED",
-  "VAR_ID", "CONST_ID", "FULL", "$accept", "S", "E", "RULE", "FACT", "AR",
-  "ARG_LIST", "FACT_LIST", "LIST", "REST_LIST", "HEAD_CONTENT", "ARG", YY_NULLPTR
+  "NUMBER", "CONST_ID", "VAR_ID", "$accept", "S", "E", "RULE", "FACT",
+  "AR", "ARG_LIST", "FACT_LIST", "LIST", "REST_LIST", "HEAD_CONTENT",
+  "ARG", YY_NULLPTR
 };
 #endif
 
@@ -510,10 +511,10 @@ static const yytype_uint16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF -21
+#define YYPACT_NINF -22
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-21)))
+  (!!((Yystate) == (-22)))
 
 #define YYTABLE_NINF -1
 
@@ -524,10 +525,10 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -18,    -3,     0,   -21,    -9,    -8,     8,   -16,   -21,   -21,
-     -21,   -21,   -18,   -21,   -20,   -21,   -21,     2,   -21,   -10,
-       5,   -21,   -21,   -21,   -12,   -21,   -16,   -18,   -18,   -18,
-     -21,   -21,   -21,     3,     4,   -21,   -21
+     -18,    -2,     0,   -22,    -8,    -7,     9,   -16,   -22,   -22,
+     -22,   -22,   -18,   -22,   -21,   -22,   -22,   -22,     2,   -22,
+       7,     8,    13,   -22,   -22,   -22,    -9,   -22,   -16,   -18,
+     -22,   -18,   -18,   -22,   -22,   -22,     5,    10,   -22,   -22
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -536,23 +537,23 @@ static const yytype_int8 yypact[] =
 static const yytype_uint8 yydefact[] =
 {
        0,     0,     0,     3,     0,     0,     0,     0,     1,     2,
-       4,     5,     0,     7,     0,    18,    19,     0,    20,    10,
-      12,     6,    16,    17,     0,     8,     0,     0,     0,     0,
-      13,     9,    11,     0,     0,    15,    14
+       4,     5,     0,     7,     0,    20,    19,    22,     0,    21,
+      10,    12,     0,    17,    18,    16,     0,     8,     0,     0,
+       6,     0,     0,    13,     9,    11,     0,     0,    15,    14
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -21,   -21,    19,   -21,   -21,   -11,    -2,    -1,   -21,   -21,
-     -21,   -21
+     -22,   -22,    24,   -22,   -22,   -11,    -1,     1,   -22,   -22,
+     -22,   -22
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     2,     3,     4,     5,     6,    17,    21,    18,    30,
-      24,    19
+      -1,     2,     3,     4,     5,     6,    18,    22,    19,    33,
+      26,    20
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -560,16 +561,18 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-       8,    20,    14,    28,    22,    26,    23,     1,    29,    15,
-      16,    12,    13,     7,    10,    11,    20,    33,    34,    25,
-      27,     9,    35,    36,    31,     1,    32
+       8,    21,    14,    23,    24,    25,    31,     1,    15,    16,
+      17,    32,    12,    13,     7,    10,    11,    30,    21,    27,
+      36,    37,    28,    29,    38,     1,     9,    34,     0,    39,
+      35
 };
 
-static const yytype_uint8 yycheck[] =
+static const yytype_int8 yycheck[] =
 {
-       0,    12,    18,    15,    24,    15,    26,    25,    20,    25,
-      26,     3,     4,    16,    23,    23,    27,    28,    29,    17,
-      15,     2,    19,    19,    26,    25,    27
+       0,    12,    18,    24,    25,    26,    15,    25,    24,    25,
+      26,    20,     3,     4,    16,    23,    23,     4,    29,    17,
+      31,    32,    15,    15,    19,    25,     2,    28,    -1,    19,
+      29
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -577,25 +580,25 @@ static const yytype_uint8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,    25,    28,    29,    30,    31,    32,    16,     0,    29,
-      23,    23,     3,     4,    18,    25,    26,    33,    35,    38,
-      32,    34,    24,    26,    37,    17,    15,    15,    15,    20,
-      36,    33,    34,    32,    32,    19,    19
+      23,    23,     3,     4,    18,    24,    25,    26,    33,    35,
+      38,    32,    34,    24,    25,    26,    37,    17,    15,    15,
+       4,    15,    20,    36,    33,    34,    32,    32,    19,    19
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
        0,    27,    28,    28,    29,    29,    30,    31,    32,    33,
-      33,    34,    34,    35,    36,    36,    37,    37,    38,    38,
-      38
+      33,    34,    34,    35,    36,    36,    37,    37,    37,    38,
+      38,    38,    38
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     2,     1,     2,     2,     3,     2,     4,     3,
+       0,     2,     2,     1,     2,     2,     4,     2,     4,     3,
        1,     3,     1,     3,     3,     3,     1,     1,     1,     1,
-       1
+       1,     1,     1
 };
 
 
@@ -1272,19 +1275,19 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 21 "parser_prolog_hornclauses.y" /* yacc.c:1646  */
+#line 20 "parser_prolog_hornclauses.y" /* yacc.c:1646  */
     {printf("Congrats. You seem to have a clue about Horn clauses.");}
-#line 1278 "y.tab.c" /* yacc.c:1646  */
+#line 1281 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 22 "parser_prolog_hornclauses.y" /* yacc.c:1646  */
+#line 21 "parser_prolog_hornclauses.y" /* yacc.c:1646  */
     {printf("Congrats. You seem to have a clue about Horn clauses.");}
-#line 1284 "y.tab.c" /* yacc.c:1646  */
+#line 1287 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1288 "y.tab.c" /* yacc.c:1646  */
+#line 1291 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1512,7 +1515,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 52 "parser_prolog_hornclauses.y" /* yacc.c:1906  */
+#line 53 "parser_prolog_hornclauses.y" /* yacc.c:1906  */
 
 int main(int argc, char **argv) {
 	yyparse();

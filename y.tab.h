@@ -66,9 +66,9 @@ extern int yydebug;
     ASTERIX = 276,
     COLON = 277,
     NEW_LINE_FEED = 278,
-    VAR_ID = 279,
+    NUMBER = 279,
     CONST_ID = 280,
-    FULL = 281
+    VAR_ID = 281
   };
 #endif
 /* Tokens.  */
@@ -93,9 +93,9 @@ extern int yydebug;
 #define ASTERIX 276
 #define COLON 277
 #define NEW_LINE_FEED 278
-#define VAR_ID 279
+#define NUMBER 279
 #define CONST_ID 280
-#define FULL 281
+#define VAR_ID 281
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -104,8 +104,8 @@ union YYSTYPE
 {
 #line 5 "parser_prolog_hornclauses.y" /* yacc.c:1909  */
 
-char[] str;
-int integer;
+char* str;
+int num;
 
 #line 111 "y.tab.h" /* yacc.c:1909  */
 };
