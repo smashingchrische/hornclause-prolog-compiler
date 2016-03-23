@@ -74,7 +74,7 @@ ARG: CONST_ID
 
 
 %%
-int partial_problem_counter;
+int rule_counter;
 
 struct variable {
 	struct variable *ptr_next;
@@ -87,6 +87,10 @@ struct partial_problem {
 	struct variable *ptr_var; 
 };
 
+struct rule {
+	struct partial_problem *ptr_prob;
+	struct rule *ptr_next;
+};
 int main(int argc, char **argv) {
 	yyparse();
 	return 0;
