@@ -65,10 +65,11 @@ extern int yydebug;
     PIPE = 275,
     ASTERIX = 276,
     COLON = 277,
-    NEW_LINE_FEED = 278,
-    NUMBER = 279,
-    CONST_ID = 280,
-    VAR_ID = 281
+    SLASH = 278,
+    NEW_LINE_FEED = 279,
+    NUMBER = 280,
+    CONST_ID = 281,
+    VAR_ID = 282
   };
 #endif
 /* Tokens.  */
@@ -92,10 +93,11 @@ extern int yydebug;
 #define PIPE 275
 #define ASTERIX 276
 #define COLON 277
-#define NEW_LINE_FEED 278
-#define NUMBER 279
-#define CONST_ID 280
-#define VAR_ID 281
+#define SLASH 278
+#define NEW_LINE_FEED 279
+#define NUMBER 280
+#define CONST_ID 281
+#define VAR_ID 282
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -107,7 +109,7 @@ union YYSTYPE
 char* str;
 int num;
 
-#line 111 "y.tab.h" /* yacc.c:1909  */
+#line 113 "y.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

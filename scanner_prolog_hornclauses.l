@@ -13,6 +13,7 @@
 \+ {return PLUS;}
 \- {return MINUS;}
 \* {return ASTERIX;}
+\/ {return SLASH;}
 \: {return COLON;}
 \< {return SMALLER;}
 \=< {return SMALLER_EQUALS;}
