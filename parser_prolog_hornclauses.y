@@ -19,8 +19,8 @@ int num;
 %left UNEQUALS SMALLER SMALLER_EQUALS GREATER GREATER_EQUALS
 %%
 
-S: S E {printf("Congrats. You seem to have a clue about Horn clauses.");}
-|E {printf("Congrats. You seem to have a clue about Horn clauses.");}
+S: S E {printf("\nCongrats. You seem to have a clue about Horn clauses.\n");}
+|E {printf("\nCongrats. You seem to have a clue about Horn clauses.\n");}
 
 E: RULE NEW_LINE_FEED
 | FACT NEW_LINE_FEED;
@@ -74,11 +74,24 @@ ARG: CONST_ID
 
 
 %%
+int partial_problem_counter;
+
+struct variable {
+	struct variable *ptr_next;
+	char *name;
+};
+
+struct partial_problem {
+	struct partial_problem *ptr_next;
+	int number;
+	struct variable *ptr_var; 
+};
+
 int main(int argc, char **argv) {
 	yyparse();
 	return 0;
 }
 void yyerror (char *message){
-	printf("This is not a Horn clause. Please start the program again");
+	printf("\nThis is not a Horn clause. Please start the program again\n");
 }
 

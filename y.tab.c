@@ -1533,6 +1533,17 @@ yyreturn:
 }
 #line 76 "parser_prolog_hornclauses.y" /* yacc.c:1906  */
 
+struct variable {
+	struct variable *ptr_next;
+	char *name;
+};
+
+struct partial_problem {
+	struct partial_problem *ptr_next;
+	int number;
+	struct variable *ptr_var; 
+};
+
 int main(int argc, char **argv) {
 	yyparse();
 	return 0;
