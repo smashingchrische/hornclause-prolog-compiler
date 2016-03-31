@@ -145,6 +145,7 @@ void print_the_lot(){
 }
 int main(int argc, char **argv) {
 	FILE *fopenFile;
+	extern FILE* yyin;
 	var_head = 0;
 	var_tail = 0;
 	pp_head = 0;
