@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
 	yyin = fopen("input_file.txt","r");
 	yyparse();
 	
-	fclose(fopenFile);
+	fclose(yyin);
 	return 0;
 }
 void yyerror (char *message){
