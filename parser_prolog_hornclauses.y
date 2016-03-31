@@ -144,12 +144,16 @@ void print_the_lot(){
 	pp_tail = 0;
 }
 int main(int argc, char **argv) {
+	FILE *fopenFile;
 	var_head = 0;
 	var_tail = 0;
 	pp_head = 0;
-        pp_tail = 0;
-
+    pp_tail = 0;
+	
+	yyin = fopen_s(&fopenFile,"input_file.txt","r");
 	yyparse();
+	
+	fclose(fopenFile);
 	return 0;
 }
 void yyerror (char *message){
