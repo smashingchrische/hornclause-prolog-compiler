@@ -104,7 +104,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 5 "parser_prolog_hornclauses.y" /* yacc.c:1909  */
+#line 24 "parser_prolog_hornclauses.y" /* yacc.c:1909  */
 
 char* str;
 int num;
