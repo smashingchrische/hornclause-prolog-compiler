@@ -39,10 +39,12 @@ int num;
 %%
 
 S: S E {printf("\nCongrats. You seem to have a clue about Horn clauses.\n"); print_the_lot();}
-|E {printf("\nCongrats. You seem to have a clue about Horn clauses.\n"); print_the_lot();};
+| E {printf("\nCongrats. You seem to have a clue about Horn clauses.\n"); print_the_lot();}
+| S NEW_LINE_FEED
+| NEW_LINE_FEED;
 
-E: RULE NEW_LINE_FEED
-| FACT NEW_LINE_FEED;
+E: RULE
+| FACT;
 
 RULE: AR IMPLIES FACT_LIST DOT;
 
@@ -138,6 +140,8 @@ void print_the_lot(){
 		problem_counter++;
 		ptr_tmp = ptr_tmp->ptr_next;	
 	}
+	pp_head = 0;
+	pp_tail = 0;
 }
 int main(int argc, char **argv) {
 	var_head = 0;
