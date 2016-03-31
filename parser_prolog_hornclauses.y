@@ -150,7 +150,6 @@ int main(int argc, char **argv) {
 	pp_head = 0;
     pp_tail = 0;
 	
-	printf("\nhuhu1\n");
 	yyin = fopen("input_file.txt","r");
 	yyparse();
 	
