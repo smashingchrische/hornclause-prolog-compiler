@@ -144,7 +144,6 @@ void print_the_lot(){
 	pp_tail = 0;
 }
 int main(int argc, char **argv) {
-	FILE *fopenFile;
 	extern FILE* yyin;
 	var_head = 0;
 	var_tail = 0;
@@ -152,7 +151,7 @@ int main(int argc, char **argv) {
     pp_tail = 0;
 	
 	printf("\nhuhu1\n");
-	yyin = fopen_s(&fopenFile,"input_file.txt","r");
+	yyin = fopen("input_file.txt","r");
 	yyparse();
 	
 	fclose(fopenFile);
