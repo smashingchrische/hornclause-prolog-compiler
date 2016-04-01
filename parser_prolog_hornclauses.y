@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#define CHUNK 1024 /* read 1024 bytes at a time */
 void yyerror(char *message);
  int problem_counter;
  struct variable * var_head;
@@ -145,12 +146,18 @@ void print_the_lot(){
 }
 int main(int argc, char **argv) {
 	extern FILE* yyin;
+	size_t nread;
+	char buf[CHUNK];
+	
 	var_head = 0;
 	var_tail = 0;
 	pp_head = 0;
     pp_tail = 0;
 	
 	yyin = fopen("input_file.txt","r");
+	 while ((nread = fread(buf, 1, sizeof buf, yyin)) > 0){
+        fwrite(buf, 1, nread, stdout);
+	 }
 	yyparse();
 	
 	fclose(yyin);

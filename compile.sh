@@ -11,5 +11,7 @@ gcc y.tab.c lex.yy.c -lfl -lm -o myprolog.exe
 echo '\t\t Done.'
 
 echo '\n Starting the programm...'
-echo '\n Please enter your Horn clauses:'
+echo '\n Reading the input_file.txt:'
+echo '\t\t Done.'
+echo '\n \n'
 ./myprolog.exe
