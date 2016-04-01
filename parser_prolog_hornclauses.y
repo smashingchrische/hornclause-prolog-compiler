@@ -132,10 +132,13 @@ void print_the_lot(){
 	struct partial_problem * ptr_tmp = pp_head;
 	struct variable * ptr_var_tmp = 0;
 	problem_counter = 0;
-	printf("\nCongrats. You seem to have a clue about Horn clauses line #%d is correct: \n", line_counter); 
-	fprintf(yyout,"\nCongrats. You seem to have a clue about Horn clauses line #%d is correct: \n", line_counter); 
+	
+	printf("\nCongrats. You seem to have a clue about Horn clauses. Line #%d is correct: \n", line_counter); 
+	fprintf(yyout,"\nCongrats. You seem to have a clue about Horn clauses. Line #%d is correct: \n", line_counter); 
+	
 	printf("\n\tProblem Counter\t|\tIncluded Variables");
 	fprintf(yyout,"\n\tProblem Counter\t|\tIncluded Variables");
+	
 	while(ptr_tmp) {
 		ptr_var_tmp = ptr_tmp->ptr_var;
 		printf("\n\t%d\t\t|\t",problem_counter);
@@ -152,6 +155,7 @@ void print_the_lot(){
 	}
 	pp_head = 0;
 	pp_tail = 0;
+	
 	line_counter++;
 	fclose(yyout);
 }
@@ -179,8 +183,10 @@ int main(int argc, char **argv) {
 void yyerror (char *message){
 	extern FILE* yyout;
 	yyout = fopen("output_file.txt", "a+");
+	
 	printf("\nThis is not a Horn clause. Please start the program again\n");
 	fprintf(yyout,"\nThis is not a Horn clause. Please start the program again\n");
+	
 	fclose(yyout);
 }
 
