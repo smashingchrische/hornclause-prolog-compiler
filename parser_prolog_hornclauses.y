@@ -3,6 +3,7 @@
 #define CHUNK 1024 /* read 1024 bytes at a time */
 void yyerror(char *message);
  int problem_counter;
+ int line_counter = 1;
  struct variable * var_head;
  struct variable * var_tail;
  struct partial_problem * pp_head;
@@ -39,8 +40,8 @@ int num;
 %left UNEQUALS SMALLER SMALLER_EQUALS GREATER GREATER_EQUALS
 %%
 
-S: S E {printf("\nCongrats. You seem to have a clue about Horn clauses.\n"); print_the_lot();}
-| E {printf("\nCongrats. You seem to have a clue about Horn clauses.\n"); print_the_lot();}
+S: S E {print_the_lot();}
+| E {print_the_lot();}
 | S NEW_LINE_FEED
 | NEW_LINE_FEED;
 
@@ -129,23 +130,31 @@ void print_the_lot(){
 	struct partial_problem * ptr_tmp = pp_head;
 	struct variable * ptr_var_tmp = 0;
 	problem_counter = 0;
+	printf("\nCongrats. You seem to have a clue about Horn clauses line #%d is correct: \n", line_counter); 
+	fprintf(yyout,"\nCongrats. You seem to have a clue about Horn clauses line #%d is correct: \n", line_counter); 
 	printf("\n\tProblem Counter\t|\tIncluded Variables");
+	fprintf(yyout,"\n\tProblem Counter\t|\tIncluded Variables");
 	while(ptr_tmp) {
 		ptr_var_tmp = ptr_tmp->ptr_var;
 		printf("\n\t%d\t\t|\t",problem_counter);
+		fprintf(yyout,"\n\t%d\t\t|\t",problem_counter);
 		while(ptr_var_tmp){
 			printf("%s, ", ptr_var_tmp->name);
+			fprintf(yyout, "%s, ", ptr_var_tmp->name);
 			ptr_var_tmp = ptr_var_tmp->ptr_next;
 		}
 		printf("\n");
+		fprintf(yyout, "\n");
 		problem_counter++;
 		ptr_tmp = ptr_tmp->ptr_next;	
 	}
 	pp_head = 0;
 	pp_tail = 0;
+	line_counter++;
 }
 int main(int argc, char **argv) {
 	extern FILE* yyin;
+	extern FILE* yyout;
 	size_t nread;
 	char buf[CHUNK];
 	
@@ -155,6 +164,7 @@ int main(int argc, char **argv) {
     pp_tail = 0;
 	
 	yyin = fopen("input_file.txt","r");
+	yyout = fopen("output_file.txt", "w");
 	 while ((nread = fread(buf, 1, sizeof buf, yyin)) > 0){
         fwrite(buf, 1, nread, stdout);
 	 }
@@ -163,9 +173,11 @@ int main(int argc, char **argv) {
 	yyparse();
 	
 	fclose(yyin);
+	fclose(yyout);
 	return 0;
 }
 void yyerror (char *message){
 	printf("\nThis is not a Horn clause. Please start the program again\n");
+	fprintf(yyout,"\nThis is not a Horn clause. Please start the program again\n");
 }
 
