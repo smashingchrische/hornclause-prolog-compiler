@@ -158,9 +158,8 @@ int main(int argc, char **argv) {
 	 while ((nread = fread(buf, 1, sizeof buf, yyin)) > 0){
         fwrite(buf, 1, nread, stdout);
 	 }
-	fclose(yyin);
+	rewind(yyin);
 	
-	yyin = fopen("input_file.txt","r");
 	yyparse();
 	
 	fclose(yyin);
