@@ -159,6 +159,7 @@ int main(int argc, char **argv) {
         fwrite(buf, 1, nread, stdout);
 	 }
 	rewind(yyin);
+	
 	yyparse();
 	
 	fclose(yyin);
