@@ -177,7 +177,10 @@ int main(int argc, char **argv) {
 	return 0;
 }
 void yyerror (char *message){
+	extern FILE* yyout;
+	yyout = fopen("output_file.txt", "a+");
 	printf("\nThis is not a Horn clause. Please start the program again\n");
 	fprintf(yyout,"\nThis is not a Horn clause. Please start the program again\n");
+	fclose(yyout);
 }
 
