@@ -127,6 +127,8 @@ void gen_partial_problem_node(){
         }
 }
 void print_the_lot(){
+	extern FILE* yyout;
+	yyout = fopen("output_file.txt", "a+");
 	struct partial_problem * ptr_tmp = pp_head;
 	struct variable * ptr_var_tmp = 0;
 	problem_counter = 0;
@@ -151,10 +153,10 @@ void print_the_lot(){
 	pp_head = 0;
 	pp_tail = 0;
 	line_counter++;
+	fclose(yyout);
 }
 int main(int argc, char **argv) {
 	extern FILE* yyin;
-	extern FILE* yyout;
 	size_t nread;
 	char buf[CHUNK];
 	
@@ -164,7 +166,6 @@ int main(int argc, char **argv) {
     pp_tail = 0;
 	
 	yyin = fopen("input_file.txt","r");
-	yyout = fopen("output_file.txt", "w");
 	 while ((nread = fread(buf, 1, sizeof buf, yyin)) > 0){
         fwrite(buf, 1, nread, stdout);
 	 }
@@ -173,7 +174,6 @@ int main(int argc, char **argv) {
 	yyparse();
 	
 	fclose(yyin);
-	fclose(yyout);
 	return 0;
 }
 void yyerror (char *message){
