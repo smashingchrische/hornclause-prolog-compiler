@@ -2,27 +2,40 @@
 #include <stdio.h>
 #define CHUNK 1024 /* read 1024 bytes at a time */
 void yyerror(char *message);
- int problem_counter;
- int line_counter = 1;
- struct variable * var_head;
- struct variable * var_tail;
- struct partial_problem * pp_head;
- struct partial_problem * pp_tail; 
- struct variable {
-          struct variable *ptr_next;
-          char *name;
+int problem_counter;
+int line_counter = 1;
+struct variable * var_head;
+struct variable * var_tail;
+struct partial_problem * pp_head;
+struct partial_problem * pp_tail; 
+struct table_row *tr_head;
+struct table_row *tr_tail;
+struct variable {
+	struct variable *ptr_next;
+	char *name;
 };
  
 struct partial_problem {
-          struct partial_problem *ptr_next;
-          struct variable *ptr_var;
+        struct partial_problem *ptr_next;
+        struct variable *ptr_var;
+	struct table_row *ptr_tr;
+};
+struct table_row {
+	char type;
+	int r_nr;
+	int r_port;
+	int l_nr;
+	int l_port;
+	char* info;
+	struct table_row *ptr_next;
 };
 void gen_var_node(char* var_name);
-struct partial_problem * gen_struct_pp();
-void gen_partial_problem_node();
+void gen_partial_problem_node(int is_entry, char* info);
+struct table_row* make(int is_entry, char* info);
 void yyerror (char *message);
 void print_the_lot();
 void table_entry(char type, int r_nr, int r_port, int l_nr, int l_port, char* info);
+void table_writer(struct table_row *row);
 int table_counter = 1;
 %}
 %union{
@@ -50,12 +63,14 @@ S: S E {print_the_lot();}
 E: RULE
 | FACT;
 
-RULE: AR IMPLIES FACT_LIST DOT;
+RULE: SR IMPLIES FACT_LIST DOT;
 
-FACT: AR DOT;
+FACT: SR DOT;
 
-AR: CONST_ID OPEN_PARA ARG_LIST CLOSE_PARA {gen_partial_problem_node(); var_head = 0;}
-| ARITHMETIC_EXP {gen_partial_problem_node(); var_head = 0;};
+SR: CONST_ID OPEN_PARA ARG_LIST CLOSE_PARA {gen_partial_problem_node(1,$1); var_head = 0;};
+
+AR: CONST_ID OPEN_PARA ARG_LIST CLOSE_PARA {gen_partial_problem_node(0, $1); var_head = 0;}
+| ARITHMETIC_EXP {gen_partial_problem_node(0,""); var_head = 0;};
 
 ARITHMETIC_EXP: VAR_ID OPERATOR ARITHMETIC_REST;
 
@@ -112,14 +127,11 @@ void gen_var_node(char* var_name){
 		var_tail = ptr;
 	}
 }
-struct partial_problem * gen_struct_pp(){
-	struct partial_problem *ptr = malloc(sizeof(struct partial_problem));
-	return ptr;
-}
-void gen_partial_problem_node(){
+void gen_partial_problem_node(int is_entry, char* info){
 	struct partial_problem *ptr = malloc(sizeof(struct partial_problem));
         ptr->ptr_var = var_head;
 	ptr->ptr_next = 0;
+	ptr->ptr_tr = make(is_entry, info);
         if (!pp_head){
                 pp_head = ptr;
                 pp_tail = ptr;
@@ -127,6 +139,14 @@ void gen_partial_problem_node(){
                 pp_tail->ptr_next = ptr;
                 pp_tail = ptr;
         }
+}
+struct table_row*  make(int is_entry, char* info){
+	struct table_row *ptr = malloc(sizeof(struct table_row));
+	ptr->info = info;
+	if (is_entry){
+		ptr->type= 'E';
+	}
+	return ptr;
 }
 void print_the_lot(){
 	extern FILE* yyout;
@@ -156,8 +176,6 @@ void print_the_lot(){
 		problem_counter++;
 		ptr_tmp = ptr_tmp->ptr_next;	
 	}
-	pp_head = 0;
-	pp_tail = 0;
 	
 	line_counter++;
 	fclose(yyout);
@@ -188,6 +206,9 @@ void table_entry(char type, int r_nr, int r_port, int l_nr, int l_port, char* in
 	table_counter++;
 	fclose(table_out);
 }
+void table_writer(struct table_row *row){
+	table_entry(row->type,row->r_nr,row->r_port,row->l_nr,row->l_port,row->info);
+}
 int main(int argc, char **argv) {
 	extern FILE* yyin;
 	size_t nread;
@@ -196,10 +217,10 @@ int main(int argc, char **argv) {
 	var_head = 0;
 	var_tail = 0;
 	pp_head = 0;
-    pp_tail = 0;
+        pp_tail = 0;
 	
 	yyin = fopen("input_file.txt","r");
-	 while ((nread = fread(buf, 1, sizeof buf, yyin)) > 0){
+	while ((nread = fread(buf, 1, sizeof buf, yyin)) > 0){
         fwrite(buf, 1, nread, stdout);
 	 }
 	rewind(yyin);
