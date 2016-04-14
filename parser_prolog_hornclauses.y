@@ -21,21 +21,26 @@ struct partial_problem {
 	struct table_row *ptr_tr;
 };
 struct table_row {
+	int index;
 	char type;
-	int r_nr;
-	int r_port;
-	int l_nr;
-	int l_port;
+	struct row_output *out;
 	char* info;
 	struct table_row *ptr_next;
+};
+struct row_output {
+	struct table_row* link;
+	int port;
+	char type;
+	struct row_output* next;
 };
 void gen_var_node(char* var_name);
 void gen_partial_problem_node(int is_entry, char* info);
 struct table_row* make(int is_entry, char* info);
 void yyerror (char *message);
 void print_the_lot();
-void table_entry(char type, int r_nr, int r_port, int l_nr, int l_port, char* info);
+void table_entry(int index, char type, struct row_output *out, char* info);
 void table_writer(struct table_row *row);
+void schwinn();
 int table_counter = 1;
 %}
 %union{
@@ -144,7 +149,9 @@ struct table_row*  make(int is_entry, char* info){
 	struct table_row *ptr = malloc(sizeof(struct table_row));
 	ptr->info = info;
 	if (is_entry){
-		ptr->type= 'E';
+		ptr->type='E';
+	} else{
+		ptr->type='U';
 	}
 	return ptr;
 }
@@ -165,7 +172,7 @@ void print_the_lot(){
 		ptr_var_tmp = ptr_tmp->ptr_var;
 		printf("\n\t%d\t\t|\t",problem_counter);
 		fprintf(yyout,"\n\t%d\t\t|\t",problem_counter);
-		table_entry('E',12,13,7,1,0);
+		table_entry(1,'E',0,0);
 		while(ptr_var_tmp){
 			printf("%s, ", ptr_var_tmp->name);
 			fprintf(yyout, "%s, ", ptr_var_tmp->name);
@@ -180,22 +187,19 @@ void print_the_lot(){
 	line_counter++;
 	fclose(yyout);
 }
-void table_entry(char type, int r_nr, int r_port, int l_nr, int l_port, char* info){
+void table_entry(int index, char type,struct row_output *out, char* info){
 	FILE* table_out;
 	table_out = fopen("output_table.txt","a+");
-	fprintf(table_out,"%d \t %c",table_counter,type);
-	if(r_nr < 0){
+	fprintf(table_out,"%d \t %c",index,type);
+	if(out == 0){
 		fprintf(table_out,"\t -");
 	}
 	else{
-		fprintf(table_out,"\t(%d,%d)", r_nr,r_port);
+		while(out!=0) {
+			fprintf(table_out,"\t(%d,%d)", out->link->index,out->port);
+			out = out->next;
+		}
 	}
-	if(l_nr < 0){
-                fprintf(table_out,"\t -");
-        }
-        else{
-                fprintf(table_out,"\t(%d,%d)", l_nr,l_port);
-        }
 	if ( info == 0 ){
 		fprintf(table_out,"\t -");
 	}
@@ -207,7 +211,50 @@ void table_entry(char type, int r_nr, int r_port, int l_nr, int l_port, char* in
 	fclose(table_out);
 }
 void table_writer(struct table_row *row){
-	table_entry(row->type,row->r_nr,row->r_port,row->l_nr,row->l_port,row->info);
+	table_entry(row->index,row->type,row->out,row->info);
+}
+void schwinn(){
+	tr_head = pp_head->ptr_tr;	
+	struct partial_problem * pp_current = pp_head;
+	pp_current = pp_current->ptr_next;
+	// part 2.1.1
+	struct row_output* entry_node_out = malloc(sizeof(struct row_output));
+	entry_node_out->type = 'R';
+	entry_node_out->port = 1;
+	entry_node_out->next = 0;
+	entry_node_out->link = pp_current->ptr_tr;
+	tr_head->out = entry_node_out;
+	// part 2.1.2
+	pp_current = pp_current->ptr_next;	
+	if(pp_current->ptr_tr->type == 'U'){
+		struct table_row* c_node = malloc(sizeof(struct table_row));
+		pp_current->ptr_tr->ptr_next = c_node;
+		c_node->type = 'C';
+		struct row_output* copy_node_out = malloc(sizeof(struct row_output));
+		copy_node_out->port = 1;
+		copy_node_out->next = 0;
+		copy_node_out->link = tr_head->out->link;
+		copy_node_out->next = malloc(sizeof(struct row_output));
+		copy_node_out->next->port = 1;
+		copy_node_out->next->next = 0;
+		copy_node_out->next->link = pp_current->ptr_tr;
+		c_node->out = copy_node_out;
+		tr_head->out->link = c_node;
+		while(pp_current->ptr_next->ptr_tr->type == 'U') {
+			pp_current = pp_current->ptr_next;
+			struct row_output *tmp = c_node->out;
+			while(tmp->next != 0) {
+				tmp = tmp->next;
+			}
+			struct row_output *new = malloc(sizeof(struct row_output));
+			new->port = 1;
+			new->next = 0;
+			new->link = pp_current->ptr_tr;
+			tmp->next = new;
+		}
+		
+	}else{
+	}
 }
 int main(int argc, char **argv) {
 	extern FILE* yyin;

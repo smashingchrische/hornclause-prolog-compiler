@@ -32,3 +32,52 @@ Congrats. You seem to have a clue about Horn clauses. Line #1 is correct:
 	0		|	X, R, L, X, S, 
 
 	1		|	R, L, S, 
+
+Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
+
+	Problem Counter	|	Included Variables
+	0		|	X, R, L, X, S, 
+
+	1		|	R, L, S, 
+
+Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
+
+	Problem Counter	|	Included Variables
+	0		|	X, R, L, X, S, 
+
+	1		|	R, L, S, 
+
+Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
+
+	Problem Counter	|	Included Variables
+	0		|	X, R, L, X, S, 
+
+	1		|	R, L, S, 
+
+Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
+
+	Problem Counter	|	Included Variables
+	0		|	X, R, L, X, S, 
+
+	1		|	R, L, S, 
+
+Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
+
+	Problem Counter	|	Included Variables
+	0		|	X, R, L, X, S, 
+
+	1		|	R, L, S, 
+
+Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
+
+	Problem Counter	|	Included Variables
+	0		|	X, R, L, X, S, 
+
+	1		|	R, L, S, 
+
+Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
+
+	Problem Counter	|	Included Variables
+	0		|	X, R, L, X, S, 
+
+	1		|	R, L, S, 
