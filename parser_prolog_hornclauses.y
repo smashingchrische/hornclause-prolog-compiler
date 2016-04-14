@@ -22,6 +22,8 @@ struct partial_problem * gen_struct_pp();
 void gen_partial_problem_node();
 void yyerror (char *message);
 void print_the_lot();
+void table_entry(char type, int r_nr, int r_port, int l_nr, int l_port, char* info);
+int table_counter = 1;
 %}
 %union{
 char* str;
@@ -143,6 +145,7 @@ void print_the_lot(){
 		ptr_var_tmp = ptr_tmp->ptr_var;
 		printf("\n\t%d\t\t|\t",problem_counter);
 		fprintf(yyout,"\n\t%d\t\t|\t",problem_counter);
+		table_entry('E',12,13,7,1,0);
 		while(ptr_var_tmp){
 			printf("%s, ", ptr_var_tmp->name);
 			fprintf(yyout, "%s, ", ptr_var_tmp->name);
@@ -158,6 +161,32 @@ void print_the_lot(){
 	
 	line_counter++;
 	fclose(yyout);
+}
+void table_entry(char type, int r_nr, int r_port, int l_nr, int l_port, char* info){
+	FILE* table_out;
+	table_out = fopen("output_table.txt","a+");
+	fprintf(table_out,"%d \t %c",table_counter,type);
+	if(r_nr < 0){
+		fprintf(table_out,"\t -");
+	}
+	else{
+		fprintf(table_out,"\t(%d,%d)", r_nr,r_port);
+	}
+	if(l_nr < 0){
+                fprintf(table_out,"\t -");
+        }
+        else{
+                fprintf(table_out,"\t(%d,%d)", l_nr,l_port);
+        }
+	if ( info == 0 ){
+		fprintf(table_out,"\t -");
+	}
+	else{
+		fprintf(table_out,"\t %s",info);
+	}
+	fprintf(table_out,"\n");
+	table_counter++;
+	fclose(table_out);
 }
 int main(int argc, char **argv) {
 	extern FILE* yyin;
