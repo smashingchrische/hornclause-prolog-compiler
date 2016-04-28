@@ -1,14 +1,20 @@
 %{
 	#include <stdio.h>
-	#define CHUNK 1024 /* read 1024 bytes at a time */
+	#include <string.h>
+	#define CHUNK 1024 /*read 1024 bytes at a time */
+	#define ABSOLUTE_DEPENDENCY 1
+	#define G_INDEPENDENCY 2
+	#define I_INDEPENDENCY 3
+	#define GI_INDEPENDENCY 4
+	#define ABSOLUTE_INDEPENDENCY 5
 
 	int problem_counter;
 	int line_counter = 1;
 
-	struct variable * var_head;
-	struct variable * var_tail;
-	struct partial_problem * pp_head;
-	struct partial_problem * pp_tail;
+	struct variable *var_head;
+	struct variable *var_tail;
+	struct partial_problem *pp_head;
+	struct partial_problem *pp_tail;
 	struct node *node_head;
 	struct node *node_tail;
 
@@ -20,11 +26,12 @@
 		struct variable *var;
 		struct node *node;
 		struct partial_problem *next;
+		struct partial_problem *prev;
 	};
 	struct node {
 		int index;
 		char type;
-		char* info;
+		char *info;
 		struct output *out;
 		struct node *next;
 		struct node *prev;
@@ -35,10 +42,15 @@
 		struct node *target;
 		struct output *next;
 	};
+	struct dependency {
+		int type;
+		struct variable *g_vars;
+		struct variable *i_vars;
+	};
 
 	void yyerror(char *message);
 	void gen_var_node(char *var_name);
-	void gen_partial_problem_node(char type, char* info);
+	void gen_partial_problem_node(char type, char *info);
 	void yyerror (char *message);
 	void print_the_lot();
 	void table_entry(int index, char type, struct output *out, char *info);
@@ -47,7 +59,7 @@
 	int table_counter = 1;
 	%}
 	%union{
-		char* str;
+		char *str;
 		int num;
 	}
 	%start S
@@ -123,7 +135,7 @@
 
 
 	%%
-	void gen_var_node(char* var_name){
+	void gen_var_node(char *var_name){
 		struct variable *ptr = malloc(sizeof(struct variable));
 		ptr->name = var_name;
 		ptr->next = 0;
@@ -135,22 +147,24 @@
 			var_tail = ptr;
 		}
 	}
-	void gen_partial_problem_node(char type, char* info){
+	void gen_partial_problem_node(char type, char *info){
 		struct partial_problem *ptr = malloc(sizeof(struct partial_problem));
 		ptr->var = var_head;
 		ptr->next = 0;
+		ptr->prev = 0;
 		ptr->node = gen_node(type, info);
 		if (!pp_head){
 			pp_head = ptr;
 			pp_tail = ptr;
 		} else{
 			pp_tail->next = ptr;
+			ptr->prev = pp_tail;
 			pp_tail = ptr;
 		}
 	}
 
-	struct node * gen_node(char type, struct output *output, char *info) {
-		struct node* tmp = malloc(sizeof(struct node));
+	struct node *gen_node(char type, struct output *output, char *info) {
+		struct node *tmp = malloc(sizeof(struct node));
 		tmp->type = type;
 		tmp->output = output;
 		tmp->info = info;
@@ -172,8 +186,8 @@
 		current->next = new;
 	}
 
-	struct output * gen_output(int port, char type, struct node *target) {
-		struct output* tmp = malloc(sizeof(struct output));
+	struct output *gen_output(int port, char type, struct node *target) {
+		struct output *tmp = malloc(sizeof(struct output));
 		tmp->port = port;
 		tmp->type = type;
 		tmp->target = target;
@@ -197,30 +211,300 @@
 		}
 	}
 
-	void schwinn(){
-		node_head = pp_head->node;
-		struct partial_problem * pp_current = pp_head;
-		pp_current = pp_current->next;
-		// part 2.1.1
-		add_output(node_head,1,'R',pp_current->node);
-		// part 2.1.2
-		pp_current = pp_current->next;
-		if(pp_current->node->type == 'U'){
-			struct node *c_node = gen_node('C',0,0);
-			insert_node_after(pp_current->node,c_node);
-			add_output(c_node,1,0,node_head->out->target);
-			add_output(c_node,1,0,pp_current->node);
-			node_head->out->target = c_node;
-			while(pp_current->next->node->type == 'U') {
-				pp_current = pp_current->next;
-				add_output(c_node,1,0,pp_current->node)
-			}
-
+	struct node *gen_a_node(struct node *current) {
+		if(current->type == 'T') {
+			current->type = 'A';
+			return current;
 		} else {
+			struct node *a_node = gen_node('A',0,0);
+			insert_node_after(current,a_node);
+			add_output(current,1,0,a_node);
+			return a_node;
 		}
 	}
+	struct node *gen_tmp_node(struct node *current) {
+		struct node *tmp_node = gen_node('T',0,0);
+		insert_node_after(current,tmp_node);
+		add_output(current,1,0,tmp_node);
+
+		return tmp_node;
+	}
+	struct node *connect_with_entry(struct node *left, struct node *right) {
+		struct node *u_node = gen_node('U',0,0);
+		if(right->type == 'T') {
+			gen_a_node(right);
+		}
+		insert_node_after(left,u_node);
+		add_output(left,2,0,u_node);
+		add_output(right,1,0,u_node);
+
+		return u_node;
+	}
+	struct node *gen_absolute_dependency(struct node *left, struct node *right) {
+		if(left->type == 'A' && left->out != 0) {
+			struct node *c_node = gen_node('C',left->out,0);
+			left->out = gen_output(1,0,c_node);
+			left = c_node;
+		}
+		struct node *u_node = gen_node('U',0,0);
+		insert_node_after(left,u_node);
+		add_output(left,1,0,u_node);
+		add_output(right,2,0,u_node);
+
+		return gen_tmp_node(u_node);
+	}
+	struct node *gen_g_independency(struct node *left, struct node *right, char *var) {
+		if(left->type == 'A' && left->out != 0) {
+			struct node *c_node = gen_node('C',left->out,0);
+			left->out = gen_output(1,0,c_node);
+			left = c_node;
+		}
+		struct node *u_node = gen_node('U',0,0);
+		struct node *g_node = gen_node('G',0,var);
+		insert_node_after(left,u_node);
+		insert_node_after(u_node,g_node);
+		add_output(left,1,0,u_node);
+		add_output(g_node,2,'L',u_node);
+		add_output(right,1,0,g_node);
+
+		struct node *tmp_node = gen_tmp_node(u_node);
+		add_output(g_node,1,'R',u_node->out->target);
+		return tmp_node;
+	}
+	struct node *gen_i_independency(struct node *left, struct node *right, char *var) {
+		if(left->type == 'A' && left->out != 0) {
+			struct node *c_node = gen_node('C',left->out,0);
+			left->out = gen_output(1,0,c_node);
+			left = c_node;
+		}
+		struct node *u_node = gen_node('U',0,0);
+		struct node *i_node = gen_node('I',0,var);
+		insert_node_after(left,u_node);
+		insert_node_after(u_node,i_node);
+		add_output(left,1,0,u_node);
+		add_output(i_node,2,'L',u_node);
+		add_output(right,1,0,i_node);
+
+		struct node *tmp_node = gen_tmp_node(u_node);
+		add_output(i_node,1,'R',u_node->out->target);
+		return tmp_node;
+	}
+	struct node *gen_g_i_independency(struct node *left, struct node *right, char *g_var, char *i_var) {
+		if(left->type == 'A' && left->out != 0) {
+			struct node *c_node = gen_node('C',left->out,0);
+			left->out = gen_output(1,0,c_node);
+			left = c_node;
+		}
+		struct node *u_node = gen_node('U',0,0);
+		struct node *g_node = gen_node('G',0,g_var);
+		struct node *i_node = gen_node('I',0,i_var);
+		insert_node_after(left,u_node);
+		insert_node_after(u_node,g_node);
+		insert_node_after(g_node,i_node);
+		add_output(left,1,0,u_node);
+		add_output(g_node,2,'L',u_node);
+		add_output(right,1,0,g_node);
+		add_output(g_node,1,'R',i_node);
+		add_output(i_node,2,'L',u_node);
+
+		struct node *tmp_node = gen_tmp_node(u_node);
+		add_output(i_node,1,'R',u_node->out->target);
+		return tmp_node;
+	}
+
+	void add_variable(struct variable *current, char *new) {
+			struct variable * tmp = malloc(sizeof(struct variable));
+			tmp->name = new;
+			tmp->next = 0;
+			while(current->next != 0) {
+				current = current->next;
+			}
+			current->next = tmp;
+	}
+	struct dependency *check_dependency(struct partial_problem *entry, struct partial_problem *current, struct partial_problem *check) {
+		struct variable *entry_var = entry->var;
+		struct variable *current_var = current->var;
+		struct variable *check_var = check->var;
+
+		struct variable *check_equals = 0;
+		struct variable *check_different = 0;
+		struct variable *current_different = 0;
+		struct dependency *depend = malloc(sizeof(struct dependency));
+		depend->type = 0;
+		depend->i_vars = 0;
+		depend->g_vars = 0;
+
+		//check for equals between current and check
+		while(current_var != 0) {
+			while(check_var != 0) {
+				if(strcmp(current_var->name,check_var->name) == 0) {
+					if(check_equals == 0) {
+						check_equals = malloc(sizeof(struct variable));
+						check_equals->name = check_var->name;
+						check_equals->next = 0;
+					} else {
+						add_variable(check_equals,check_var->name);
+					}
+				}
+				check_var = check_var->next;
+			}
+			current_var = current_var->next;
+		}
+
+		//check for G independency/absolute dependency
+		int found;
+		struct variable *tmp_check_equals = check_equals;
+		while(tmp_check_equals != 0) {
+			found = 0;
+			while(entry_var != 0) {
+				if(strcmp(entry_var->name,tmp_check_equals->name) == 0) {
+					found = 1;
+					if(depend->g_vars == 0) {
+						depend->g_vars = malloc(sizeof(struct variable));
+						depend->g_vars->name = entry_var->name;
+						depend->type = G_INDEPENDENCY;
+						depend->g_vars->next = 0;
+					} else {
+						add_variable(depend->g_vars,entry_var->name);
+					}
+				}
+				entry_var = entry_var->next;
+			}
+			if(!found) {
+				depend->type = ABSOLUTE_DEPENDENCY;
+				return depend;
+			}
+			tmp_check_equals = tmp_check_equals->next;
+		}
+
+		//look for all that are in current but not in check
+		tmp_check_equals = check_equals;
+		current_var = current->var;
+		while(current_var != 0) {
+			found = 0;
+			while(tmp_check_equals != 0) {
+				if(strcmp(current_var->name,tmp_check_equals->name) == 0) {
+					found = 1;
+				}
+			}
+			if(!found) {
+				if(current_different == 0) {
+					current_different = malloc(sizeof(struct variable));
+					current_different->name = current_var->name;
+					current_different->next = 0;
+				} else {
+					add_variable(current_different,current_var->name);
+				}
+			}
+		}
+
+		//check for I independency on current site and absolute independency
+		entry_var = entry->var;
+		while(current_different != 0) {
+			while(entry_var != 0) {
+				if(strcmp(current_different->name,entry_var->name) == 0) {
+					if(depend->i_vars == 0) {
+						depend->i_vars = malloc(sizeof(struct variable));
+						depend->i_vars->name = entry_var->name;
+						if(depend->type == G_INDEPENDENCY) {
+							depend->type = GI_INDEPENDENCY;
+						} else {
+							depend->type = I_INDEPENDENCY;
+						}
+						depend->i_vars->next = 0;
+					} else {
+						add_variable(depend->i_vars,entry_var->name);
+					}
+				}
+			}
+		}
+		if(depend->type == 0) {
+			depend->type = ABSOLUTE_INDEPENDENCY;
+			return depend;
+		}
+
+		if(depend->type == GI_INDEPENDENCY || depend->type == I_INDEPENDENCY) {
+			//look for all that are in check but not in current
+			tmp_check_equals = check_equals;
+			check_var = check->var;
+			while(check_var != 0) {
+				found = 0;
+				while(tmp_check_equals != 0) {
+					if(strcmp(check_var->name,tmp_check_equals->name) == 0) {
+						found = 1;
+					}
+				}
+				if(!found) {
+					if(check_different == 0) {
+						check_different = malloc(sizeof(struct variable));
+						check_different->name = check_var->name;
+						check_different->next = 0;
+					} else {
+						add_variable(check_different,check_var->name);
+					}
+				}
+			}
+
+			//check for i independency on check site
+			entry_var = entry->var;
+			while(check_different != 0) {
+				while(entry_var != 0) {
+					if(strcmp(check_different->name,entry_var->name) == 0) {
+						if(depend->i_vars == 0) {
+							depend->i_vars = malloc(sizeof(struct variable));
+							depend->i_vars->name = entry_var->name;
+							if(depend->type == G_INDEPENDENCY) {
+								depend->type = GI_INDEPENDENCY;
+							} else {
+								depend->type = I_INDEPENDENCY;
+							}
+							depend->i_vars->next = 0;
+						} else {
+							add_variable(depend->i_vars,entry_var->name);
+						}
+					}
+				}
+			}
+		}
+		return depend;
+	}
+
+	void schwinn(struct partial_problem *current_pp) {
+		struct node *e_node = pp_head->node;
+		current_pp = current_pp->next;
+		//part 2.1.1
+		add_output(e_node,1,'R',current_pp->node);
+		struct node *left_u_node = connect_with_entry(e_node,gen_a_node(current_pp->node));
+		//part 2.1.2
+		current_pp = current_pp->next;
+		if(current_pp != 0) {
+			if(current_pp->node->type == 'U'){ //second partial problem
+				struct node *c_node = gen_node('C',0,0);
+				insert_node_after(current_pp->node,c_node);
+				add_output(c_node,1,0,e_node->out->target);
+				e_node->out->target = c_node;
+
+				while(current_pp->node->type == 'U') {
+					add_output(c_node,1,0,current_pp->node);
+					while(current_pp->prev->node->type != 'E') {
+
+					}
+					current_pp = current_pp->next;
+				}
+			}
+
+			struct node *r_node = gen_node('R',0,0);
+			add_output(left_u_node,r_node);
+
+			schwinn(current_pp); //I really like recursion!
+		} else {
+			struct node *r_node = gen_node('R',0,0);
+			add_output(left_u_node,r_node);
+		}
+	}
+
 	int main(int argc, char **argv) {
-		extern FILE* yyin;
+		extern FILE *yyin;
 		size_t nread;
 		char buf[CHUNK];
 
@@ -241,10 +525,10 @@
 		return 0;
 	}
 	/*void print_the_lot(){
-		extern FILE* yyout;
+		extern FILE *yyout;
 		yyout = fopen("output_file.txt", "a+");
-		struct partial_problem * tmp = pp_head;
-		struct variable * var_tmp = 0;
+		struct partial_problem *tmp = pp_head;
+		struct variable *var_tmp = 0;
 		problem_counter = 0;
 
 		printf("\nCongrats. You seem to have a clue about Horn clauses. Line #%d is correct: \n", line_counter);
@@ -273,8 +557,8 @@
 		fclose(yyout);
 	}
 
-	void table_entry(int index, char type,struct output *out, char* info){
-		FILE* table_out;
+	void table_entry(int index, char type,struct output *out, char *info){
+		FILE *table_out;
 		table_out = fopen("output_table.txt","a+");
 		fprintf(table_out,"%d \t %c",index,type);
 		if(out == 0){
@@ -300,7 +584,7 @@
 		table_entry(node->index,node->type,node->out,node->info);
 	}*/
 	void yyerror (char *message){
-		extern FILE* yyout;
+		extern FILE *yyout;
 		yyout = fopen("output_file.txt", "a+");
 
 		printf("\nThis is not a Horn clause. Please start the program again\n");
