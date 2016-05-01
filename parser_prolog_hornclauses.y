@@ -664,7 +664,7 @@
 		}
 		struct variable *vars = node->vars;
 		while(vars!=0) {
-			fprintf(output_stream,"%c,",vars->name);
+			fprintf(output_stream,"%s,",vars->name);
 			vars = vars->next;
 		}
 	}
