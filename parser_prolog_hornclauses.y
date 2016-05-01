@@ -243,8 +243,11 @@
 			return current;
 		} else {
 			struct node *a_node = gen_node('A',0,0);
+			printf("2.1");
 			insert_node_after(current,a_node);
+			printf("2.2");
 			add_output(current,1,0,a_node);
+			printf("2.3");
 			return a_node;
 		}
 	}
@@ -543,7 +546,7 @@
 		//part 2.1.1
 		printf("1\n");
 		add_output(e_node,1,'R',current_pp->node);
-		printf("2 %p\n",current_pp->node);
+		printf("2\n");
 		struct node *left_u_node = connect_with_entry(e_node,gen_a_node(current_pp->node));
 		printf("2.1.1 done\n");
 		//part 2.1.2
