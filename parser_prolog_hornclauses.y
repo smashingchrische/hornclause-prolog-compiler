@@ -172,13 +172,14 @@
 		ptr->var = var_head;
 		ptr->next = 0;
 		ptr->prev = 0;
-		ptr->node = gen_node(type, 0, gen_var_from_char(info));
+		ptr->node = gen_node(type,0,0);
 		if (!pp_head){
 			pp_head = ptr;
 			pp_tail = ptr;
 		} else{
 			pp_tail->next = ptr;
 			ptr->prev = pp_tail;
+			pp_tail->node->vars = var_head;
 			pp_tail = ptr;
 		}
 	}
