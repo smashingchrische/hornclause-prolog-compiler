@@ -29,7 +29,6 @@
 		struct partial_problem *prev;
 	};
 	struct node {
-		int index;
 		char type;
 		char *info;
 		struct output *out;
@@ -75,8 +74,8 @@
 	%left UNEQUALS SMALLER SMALLER_EQUALS GREATER GREATER_EQUALS
 	%%
 
-	S: S E {print_the_lot();}
-	| E {print_the_lot();}
+	S: S E
+	| E
 	| S NEW_LINE_FEED
 	| NEW_LINE_FEED;
 
@@ -246,10 +245,16 @@
 			left->out = gen_output(1,0,c_node);
 			left = c_node;
 		}
-		struct node *u_node = gen_node('U',0,0);
-		insert_node_after(left,u_node);
-		add_output(left,1,0,u_node);
-		add_output(right,2,0,u_node);
+		if(right->type == 'T') {
+			right->type = 'U';
+			add_output(left,1,0,right);
+		} else {
+			struct node *u_node = gen_node('U',0,0);
+			insert_node_after(left,u_node);
+			add_output(left,1,0,u_node);
+			add_output(right,2,0,u_node);
+		}
+
 
 		return gen_tmp_node(u_node);
 	}
@@ -259,13 +264,21 @@
 			left->out = gen_output(1,0,c_node);
 			left = c_node;
 		}
+
+		struct node *g_node;
+		if(right->type == 'T') {
+			right->type = 'G';
+			right->info = var;
+			g_node = right;
+		} else {
+			g_node = gen_node('G',0,var);
+			insert_node_after(left,g_node);
+			add_output(right,1,0,g_node);
+		}
 		struct node *u_node = gen_node('U',0,0);
-		struct node *g_node = gen_node('G',0,var);
-		insert_node_after(left,u_node);
-		insert_node_after(u_node,g_node);
+		insert_node_after(g_node,u_node);
 		add_output(left,1,0,u_node);
 		add_output(g_node,2,'L',u_node);
-		add_output(right,1,0,g_node);
 
 		struct node *tmp_node = gen_tmp_node(u_node);
 		add_output(g_node,1,'R',u_node->out->target);
@@ -277,13 +290,21 @@
 			left->out = gen_output(1,0,c_node);
 			left = c_node;
 		}
+
+		struct node *i_node;
+		if(right->type == 'T') {
+			right->type = 'I';
+			right->info = var;
+			i_node = right;
+		} else {
+			i_node = gen_node('I',0,var);
+			insert_node_after(left,i_node);
+			add_output(right,1,0,i_node);
+		}
 		struct node *u_node = gen_node('U',0,0);
-		struct node *i_node = gen_node('I',0,var);
-		insert_node_after(left,u_node);
-		insert_node_after(u_node,i_node);
+		insert_node_after(i_node,u_node);
 		add_output(left,1,0,u_node);
 		add_output(i_node,2,'L',u_node);
-		add_output(right,1,0,i_node);
 
 		struct node *tmp_node = gen_tmp_node(u_node);
 		add_output(i_node,1,'R',u_node->out->target);
@@ -295,21 +316,36 @@
 			left->out = gen_output(1,0,c_node);
 			left = c_node;
 		}
+
+		struct node *g_node;
+		if(right->type == 'T') {
+			right->type = 'G';
+			right->info = g_var;
+			g_node = right;
+		} else {
+			g_node = gen_node('G',0,g_var);
+			insert_node_after(left,g_node);
+			add_output(right,1,0,g_node);
+		}
 		struct node *u_node = gen_node('U',0,0);
-		struct node *g_node = gen_node('G',0,g_var);
 		struct node *i_node = gen_node('I',0,i_var);
-		insert_node_after(left,u_node);
-		insert_node_after(u_node,g_node);
 		insert_node_after(g_node,i_node);
+		insert_node_after(i_node,u_node);
 		add_output(left,1,0,u_node);
 		add_output(g_node,2,'L',u_node);
-		add_output(right,1,0,g_node);
 		add_output(g_node,1,'R',i_node);
 		add_output(i_node,2,'L',u_node);
 
 		struct node *tmp_node = gen_tmp_node(u_node);
 		add_output(i_node,1,'R',u_node->out->target);
 		return tmp_node;
+	}
+	struct node *get_last_node(struct partial_problem *pp) {
+		struct node *last_node = pp->node;
+		while(last_node != 0) {
+			last_node = last_node->next;
+		}
+		return last_node;
 	}
 
 	void add_variable(struct variable *current, char *new) {
@@ -470,6 +506,7 @@
 	}
 
 	void schwinn(struct partial_problem *current_pp) {
+		struct partial_problem *e_problem = current_pp;
 		struct node *e_node = pp_head->node;
 		current_pp = current_pp->next;
 		//part 2.1.1
@@ -486,14 +523,36 @@
 
 				while(current_pp->node->type == 'U') {
 					add_output(c_node,1,0,current_pp->node);
-					while(current_pp->prev->node->type != 'E') {
-
+					struct partial_problem *left_problem = current_pp->prev;
+					struct node *right_node = current_pp->node;
+					int absolute_independency = 1;
+					while(left_problem->node->type != 'E') {
+						struct dependency *depend = check_dependency(e_problem,current_pp,left_problem);
+						if(depend->type == ABSOLUTE_DEPENDENCY) {
+							right_node = gen_absolute_dependency(get_last_node(left_problem),right_node);
+							absolute_independency = 0;
+						} else if(depend->type == G_INDEPENDENCY) {
+							right_node = gen_g_independency(get_last_node(left_problem),right_node,depend->g_vars);
+							absolute_independency = 0;
+						} else if(depend->type == I_INDEPENDENCY) {
+							right_node = gen_i_independency(get_last_node(left_problem),right_node,depend->i_vars);
+							absolute_independency = 0;
+						} else if(depend->type == GI_INDEPENDENCY) {
+							right_node = gen_g_i_independency(get_last_node(left_problem),right_node,depend->g_vars,depend->i_vars);
+							absolute_independency = 0;
+						}
+						left_problem = left_problem->prev;
 					}
+					if(absolute_independency) {
+						right_node = gen_a_node()
+					}
+					left_u_node = connect_with_entry(left_u_node,right_node);
 					current_pp = current_pp->next;
 				}
 			}
 
 			struct node *r_node = gen_node('R',0,0);
+			insert_node_after(left_u_node,r_node);
 			add_output(left_u_node,r_node);
 
 			schwinn(current_pp); //I really like recursion!
@@ -524,12 +583,12 @@
 		fclose(yyin);
 		return 0;
 	}
-	/*void print_the_lot(){
+	void print_table(){
 		extern FILE *yyout;
 		yyout = fopen("output_file.txt", "a+");
-		struct partial_problem *tmp = pp_head;
-		struct variable *var_tmp = 0;
-		problem_counter = 0;
+
+		struct partial_problem *current_pp = pp_head;
+		int index = 0;
 
 		printf("\nCongrats. You seem to have a clue about Horn clauses. Line #%d is correct: \n", line_counter);
 		fprintf(yyout,"\nCongrats. You seem to have a clue about Horn clauses. Line #%d is correct: \n", line_counter);
@@ -537,29 +596,27 @@
 		printf("\n\tProblem Counter\t|\tIncluded Variables");
 		fprintf(yyout,"\n\tProblem Counter\t|\tIncluded Variables");
 
-		while(tmp) {
-			var_tmp = tmp->var;
-			printf("\n\t%d\t\t|\t",problem_counter);
-			fprintf(yyout,"\n\t%d\t\t|\t",problem_counter);
-			table_entry(1,'E',0,0);
-			while(var_tmp){
-				printf("%s, ", var_tmp->name);
-				fprintf(yyout, "%s, ", var_tmp->name);
-				var_tmp = var_tmp->next;
-			}
-			printf("\n");
-			fprintf(yyout, "\n");
-			problem_counter++;
-			tmp = tmp->next;
+		while(current_pp != 0) {
+			index = print_table_entry(index,current_pp->node);
+			current_pp = current_pp->next;
 		}
 
-		line_counter++;
+
 		fclose(yyout);
 	}
-
-	void table_entry(int index, char type,struct output *out, char *info){
+	int print_table_entries(int index, struct node *entry){
 		FILE *table_out;
 		table_out = fopen("output_table.txt","a+");
+
+		while(entry != 0) {
+			fprintf(table_out, "%s\n", );
+			entry = entry->next;
+		}
+
+		return index;
+	}
+
+	/*void table_entry(int index, char type,struct output *out, char *info){
 		fprintf(table_out,"%d \t %c",index,type);
 		if(out == 0){
 			fprintf(table_out,"\t -");
