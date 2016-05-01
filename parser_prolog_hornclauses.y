@@ -536,12 +536,14 @@
 	}
 
 	void schwinn(struct partial_problem *current_pp) {
+		printf("Starting Schwinn...\n");
 		struct partial_problem *e_problem = current_pp;
 		struct node *e_node = pp_head->node;
 		current_pp = current_pp->next;
 		//part 2.1.1
 		add_output(e_node,1,'R',current_pp->node);
 		struct node *left_u_node = connect_with_entry(e_node,gen_a_node(current_pp->node));
+		printf("2.1.1 done\n");
 		//part 2.1.2
 		current_pp = current_pp->next;
 		if(current_pp != 0) {
@@ -550,12 +552,13 @@
 				insert_node_after(current_pp->node,c_node);
 				add_output(c_node,1,0,e_node->out->target);
 				e_node->out->target = c_node;
-
+				printf("Starting U-Loop\n");
 				while(current_pp->node->type == 'U') {
 					add_output(c_node,1,0,current_pp->node);
 					struct partial_problem *left_problem = current_pp->prev;
 					struct node *right_node = current_pp->node;
 					int absolute_independency = 1;
+					printf("Checking to the left...\n");
 					while(left_problem->node->type != 'E') {
 						struct dependency *depend = check_dependency(e_problem,current_pp,left_problem);
 						if(depend->type == ABSOLUTE_DEPENDENCY) {
@@ -585,7 +588,6 @@
 			insert_node_after(left_u_node,r_node);
 			add_output(left_u_node,1,0,r_node);
 
-			schwinn(current_pp); //I really like recursion!
 		} else {
 			struct node *r_node = gen_node('R',0,0);
 			add_output(left_u_node,1,0,r_node);
@@ -670,30 +672,6 @@
 		fprintf(output_stream,"\n");
 	}
 
-	/*void table_entry(int index, char type,struct output *out, char *info){
-		fprintf(table_out,"%d \t %c",index,type);
-		if(out == 0){
-			fprintf(table_out,"\t -");
-		}
-		else{
-			while(out!=0) {
-				fprintf(table_out,"\t(%d,%d)", out->target->index,out->port);
-				out = out->next;
-			}
-		}
-		if ( info == 0 ){
-			fprintf(table_out,"\t -");
-		}
-		else{
-			fprintf(table_out,"\t %s",info);
-		}
-		fprintf(table_out,"\n");
-		table_counter++;
-		fclose(table_out);
-	}
-	void table_writer(struct node *node){
-		table_entry(node->index,node->type,node->out,node->info);
-	}*/
 	void yyerror (char *message){
 		extern FILE *yyout;
 		yyout = fopen("output_file.txt", "a+");
