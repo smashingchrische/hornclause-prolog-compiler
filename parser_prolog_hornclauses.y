@@ -583,12 +583,12 @@
 
 			struct node *r_node = gen_node('R',0,0);
 			insert_node_after(left_u_node,r_node);
-			add_output(left_u_node,r_node);
+			add_output(left_u_node,1,0,r_node);
 
 			schwinn(current_pp); //I really like recursion!
 		} else {
 			struct node *r_node = gen_node('R',0,0);
-			add_output(left_u_node,r_node);
+			add_output(left_u_node,1,0,r_node);
 		}
 	}
 
@@ -652,19 +652,19 @@
 		fclose(table_out);
 	}
 	int print_table_entry(struct node *node,FILE *output_stream){
-		fprintf(table_out,"%-5d%-3s",node->index,node->type);
+		fprintf(output_stream,"%-5d%-3s",node->index,node->type);
 		struct output *out = node->out;
 		while(out!=0) {
 			if(out->type != 0) {
-				fprintf(table_out,"%s:(%d,%d) ",out->type,out->target->index,out->port);
+				fprintf(output_stream,"%s:(%d,%d) ",out->type,out->target->index,out->port);
 			} else {
-				fprintf(table_out,"(%d,%d) ",out->target->index,out->port);
+				fprintf(output_stream,"(%d,%d) ",out->target->index,out->port);
 			}
 			out = out->next;
 		}
 		struct variable *vars = node->vars;
 		while(vars!=0) {
-			fprintf(table_out,"%s,",vars->name);
+			fprintf(output_stream,"%s,",vars->name);
 			vars = vars->next;
 		}
 	}
