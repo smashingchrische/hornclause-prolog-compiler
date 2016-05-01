@@ -538,10 +538,12 @@
 	void schwinn(struct partial_problem *current_pp) {
 		printf("Starting Schwinn...\n");
 		struct partial_problem *e_problem = current_pp;
-		struct node *e_node = pp_head->node;
+		struct node *e_node = e_problem->node;
 		current_pp = current_pp->next;
 		//part 2.1.1
+		printf("1\n");
 		add_output(e_node,1,'R',current_pp->node);
+		printf("2\n");
 		struct node *left_u_node = connect_with_entry(e_node,gen_a_node(current_pp->node));
 		printf("2.1.1 done\n");
 		//part 2.1.2
