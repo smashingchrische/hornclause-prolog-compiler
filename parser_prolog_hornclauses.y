@@ -455,6 +455,7 @@
 				if(strcmp(current_var->name,tmp_check_equals->name) == 0) {
 					found = 1;
 				}
+				tmp_check_equals = tmp_check_equals->next;
 			}
 			if(!found) {
 				if(current_different == 0) {
@@ -465,6 +466,7 @@
 					add_variable(current_different,current_var->name);
 				}
 			}
+			current_var = current_var->next;
 		}
 
 		//check for I independency on current site and absolute independency
@@ -485,7 +487,9 @@
 						add_variable(depend->i_vars,entry_var->name);
 					}
 				}
+				entry_var = entry_var->next;
 			}
+			current_different = current_different->next;
 		}
 		if(depend->type == 0) {
 			depend->type = ABSOLUTE_INDEPENDENCY;
@@ -502,6 +506,7 @@
 					if(strcmp(check_var->name,tmp_check_equals->name) == 0) {
 						found = 1;
 					}
+					tmp_check_equals = tmp_check_equals->next;
 				}
 				if(!found) {
 					if(check_different == 0) {
@@ -512,6 +517,7 @@
 						add_variable(check_different,check_var->name);
 					}
 				}
+				check_var = check_var->next;
 			}
 
 			//check for i independency on check site
@@ -532,23 +538,21 @@
 							add_variable(depend->i_vars,entry_var->name);
 						}
 					}
+					entry_var = entry_var->next;
 				}
+				check_different = check_different->next;
 			}
 		}
 		return depend;
 	}
 
 	void schwinn(struct partial_problem *current_pp) {
-		printf("Starting Schwinn...\n");
 		struct partial_problem *e_problem = current_pp;
 		struct node *e_node = e_problem->node;
 		current_pp = current_pp->next;
 		//part 2.1.1
-		printf("1\n");
 		add_output(e_node,1,'R',current_pp->node);
-		printf("2\n");
 		struct node *left_u_node = connect_with_entry(e_node,gen_a_node(current_pp->node));
-		printf("2.1.1 done\n");
 		//part 2.1.2
 		current_pp = current_pp->next;
 		if(current_pp != 0) {
@@ -557,13 +561,11 @@
 				insert_node_after(current_pp->node,c_node);
 				add_output(c_node,1,0,e_node->out->target);
 				e_node->out->target = c_node;
-				printf("Starting U-Loop\n");
 				while(current_pp->node->type == 'U') {
 					add_output(c_node,1,0,current_pp->node);
 					struct partial_problem *left_problem = current_pp->prev;
 					struct node *right_node = current_pp->node;
 					int absolute_independency = 1;
-					printf("Checking to the left...\n");
 					while(left_problem->node->type != 'E') {
 						struct dependency *depend = check_dependency(e_problem,current_pp,left_problem);
 						if(depend->type == ABSOLUTE_DEPENDENCY) {
