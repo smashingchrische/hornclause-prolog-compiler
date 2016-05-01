@@ -652,11 +652,11 @@
 		fclose(table_out);
 	}
 	int print_table_entry(struct node *node,FILE *output_stream){
-		fprintf(output_stream,"%-5d%-3s",node->index,node->type);
+		fprintf(output_stream,"%-5d%-3c",node->index,node->type);
 		struct output *out = node->out;
 		while(out!=0) {
 			if(out->type != 0) {
-				fprintf(output_stream,"%s:(%d,%d) ",out->type,out->target->index,out->port);
+				fprintf(output_stream,"%c:(%d,%d) ",out->type,out->target->index,out->port);
 			} else {
 				fprintf(output_stream,"(%d,%d) ",out->target->index,out->port);
 			}
@@ -664,7 +664,7 @@
 		}
 		struct variable *vars = node->vars;
 		while(vars!=0) {
-			fprintf(output_stream,"%s,",vars->name);
+			fprintf(output_stream,"%c,",vars->name);
 			vars = vars->next;
 		}
 	}
