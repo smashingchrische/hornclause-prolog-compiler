@@ -609,7 +609,7 @@
 		rewind(yyin);
 
 		yyparse();
-		schwinn();
+		schwinn(pp_head);
 		print_table();
 
 		fclose(yyin);
