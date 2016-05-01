@@ -15,8 +15,6 @@
 	struct variable *var_tail;
 	struct partial_problem *pp_head;
 	struct partial_problem *pp_tail;
-	struct node *node_head;
-	struct node *node_tail;
 
 	struct variable {
 		char *name;
@@ -29,8 +27,9 @@
 		struct partial_problem *prev;
 	};
 	struct node {
+		int index;
 		char type;
-		char *info;
+		struct variable *vars;
 		struct output *out;
 		struct node *next;
 		struct node *prev;
@@ -52,7 +51,7 @@
 	void gen_var_node(char *var_name);
 	void gen_partial_problem_node(char type, char *info);
 
-	struct node *gen_node(char type, struct output *output, char *info);
+	struct node *gen_node(char type, struct output *output, struct variable *vars);
 	void insert_node_before(struct node *current, struct node *new);
 	void insert_node_after(struct node *current, struct node *new);
 
@@ -63,16 +62,17 @@
 	struct node *gen_a_node(struct node *current);
 	struct node *connect_with_entry(struct node *left, struct node *right);
 	struct node *gen_absolute_dependency(struct node *left, struct node *right);
-	struct node *gen_g_independency(struct node *left, struct node *right, char *var);
-	struct node *gen_i_independency(struct node *left, struct node *right, char *var);
+	struct node *gen_g_independency(struct node *left, struct node *right, struct variable *vars);
+	struct node *gen_i_independency(struct node *left, struct node *right, struct variable *vars);
 	struct node *gen_g_i_independency(struct node *left, struct node *right, char *g_var, char *i_var);
 	struct node *get_last_node(struct partial_problem *pp);
 
 	void add_variable(struct variable *current, char *new);
 	struct dependency *check_dependency(struct partial_problem *entry, struct partial_problem *current, struct partial_problem *check);
 
+	struct node *connect_and_number_nodes(struct partial_problem *pp);
 	void print_table();
-	int print_table_entries(int index, struct node *entry);
+	int print_table_entries(struct node *node,FILE *output_stream);
 
 	void schwinn();
 	int table_counter = 1;
@@ -171,7 +171,7 @@
 		ptr->var = var_head;
 		ptr->next = 0;
 		ptr->prev = 0;
-		ptr->node = gen_node(type, info);
+		ptr->node = gen_node(type, 0, info);
 		if (!pp_head){
 			pp_head = ptr;
 			pp_tail = ptr;
@@ -182,11 +182,11 @@
 		}
 	}
 
-	struct node *gen_node(char type, struct output *output, char *info) {
+	struct node *gen_node(char type, struct output *output, struct variable *vars) {
 		struct node *tmp = malloc(sizeof(struct node));
 		tmp->type = type;
-		tmp->output = output;
-		tmp->info = info;
+		tmp->out = output;
+		tmp->vars = vars;
 		tmp->next = 0;
 		tmp->prev = 0;
 
@@ -265,11 +265,14 @@
 			left->out = gen_output(1,0,c_node);
 			left = c_node;
 		}
+
+		struct node *u_node;
 		if(right->type == 'T') {
 			right->type = 'U';
 			add_output(left,1,0,right);
+			u_node = right;
 		} else {
-			struct node *u_node = gen_node('U',0,0);
+			u_node = gen_node('U',0,0);
 			insert_node_after(left,u_node);
 			add_output(left,1,0,u_node);
 			add_output(right,2,0,u_node);
@@ -278,7 +281,7 @@
 
 		return gen_tmp_node(u_node);
 	}
-	struct node *gen_g_independency(struct node *left, struct node *right, char *var) {
+	struct node *gen_g_independency(struct node *left, struct node *right, struct variable *vars) {
 		if(left->type == 'A' && left->out != 0) {
 			struct node *c_node = gen_node('C',left->out,0);
 			left->out = gen_output(1,0,c_node);
@@ -288,7 +291,7 @@
 		struct node *g_node;
 		if(right->type == 'T') {
 			right->type = 'G';
-			right->info = var;
+			right->vars = vars;
 			g_node = right;
 		} else {
 			g_node = gen_node('G',0,var);
@@ -304,7 +307,7 @@
 		add_output(g_node,1,'R',u_node->out->target);
 		return tmp_node;
 	}
-	struct node *gen_i_independency(struct node *left, struct node *right, char *var) {
+	struct node *gen_i_independency(struct node *left, struct node *right, struct variable *vars) {
 		if(left->type == 'A' && left->out != 0) {
 			struct node *c_node = gen_node('C',left->out,0);
 			left->out = gen_output(1,0,c_node);
@@ -314,7 +317,7 @@
 		struct node *i_node;
 		if(right->type == 'T') {
 			right->type = 'I';
-			right->info = var;
+			right->vars = vars;
 			i_node = right;
 		} else {
 			i_node = gen_node('I',0,var);
@@ -330,7 +333,7 @@
 		add_output(i_node,1,'R',u_node->out->target);
 		return tmp_node;
 	}
-	struct node *gen_g_i_independency(struct node *left, struct node *right, char *g_var, char *i_var) {
+	struct node *gen_g_i_independency(struct node *left, struct node *right, struct variable *g_vars, struct variable *i_vars) {
 		if(left->type == 'A' && left->out != 0) {
 			struct node *c_node = gen_node('C',left->out,0);
 			left->out = gen_output(1,0,c_node);
@@ -340,15 +343,15 @@
 		struct node *g_node;
 		if(right->type == 'T') {
 			right->type = 'G';
-			right->info = g_var;
+			right->vars = g_vars;
 			g_node = right;
 		} else {
-			g_node = gen_node('G',0,g_var);
+			g_node = gen_node('G',0,g_vars);
 			insert_node_after(left,g_node);
 			add_output(right,1,0,g_node);
 		}
 		struct node *u_node = gen_node('U',0,0);
-		struct node *i_node = gen_node('I',0,i_var);
+		struct node *i_node = gen_node('I',0,i_vars);
 		insert_node_after(g_node,i_node);
 		insert_node_after(i_node,u_node);
 		add_output(left,1,0,u_node);
@@ -600,40 +603,63 @@
 
 		yyparse();
 
+		print_table();
+
 		fclose(yyin);
 		return 0;
 	}
-	void print_table(){
-		extern FILE *yyout;
-		yyout = fopen("output_file.txt", "a+");
+	struct node *connect_and_number_nodes(struct partial_problem *pp) {
+		struct node *head = pp->node;
+		struct node *current = head;
+		int index = 1;
 
-		struct partial_problem *current_pp = pp_head;
-		int index = 0;
-
-		printf("\nCongrats. You seem to have a clue about Horn clauses. Line #%d is correct: \n", line_counter);
-		fprintf(yyout,"\nCongrats. You seem to have a clue about Horn clauses. Line #%d is correct: \n", line_counter);
-
-		printf("\n\tProblem Counter\t|\tIncluded Variables");
-		fprintf(yyout,"\n\tProblem Counter\t|\tIncluded Variables");
-
-		while(current_pp != 0) {
-			index = print_table_entry(index,current_pp->node);
-			current_pp = current_pp->next;
+		while(pp!=0) {
+			while(current->next!=0) {
+				current->index = index;
+				index++;
+				current = current->next;
+			}
+			pp = pp->next;
+			if(pp!=0) {
+				current->next = pp->node;
+			}
+			current->index = index;
+			index++;
+			current = current->next;
 		}
 
-
-		fclose(yyout);
+		return head;
 	}
-	int print_table_entries(int index, struct node *entry){
+	void print_table() {
+		struct node *current = connect_and_number_nodes(pp_head);
 		FILE *table_out;
 		table_out = fopen("output_table.txt","a+");
 
-		while(entry != 0) {
-			fprintf(table_out, "%s\n", );
-			entry = entry->next;
+		printf("\nCongrats. You seem to have a clue about Horn clauses.\n");
+
+		while(current != 0) {
+			print_table_entry(current,table_out);
+			current = current->next;
 		}
 
-		return index;
+		fclose(table_out);
+	}
+	int print_table_entry(struct node *node,FILE *output_stream){
+		fprintf(table_out,"%-5d%-3s",node->index,node->type);
+		struct output *out = node->out;
+		while(out!=0) {
+			if(out->type != 0) {
+				fprintf(table_out,"%s:(%d,%d) ",out->type,out->target->index,out->port);
+			} else {
+				fprintf(table_out,"(%d,%d) ",out->target->index,out->port);
+			}
+			out = out->next;
+		}
+		struct variable *vars = node->vars;
+		while(vars!=0) {
+			fprintf(table_out,"%s,",vars->name);
+			vars = vars->next;
+		}
 	}
 
 	/*void table_entry(int index, char type,struct output *out, char *info){
