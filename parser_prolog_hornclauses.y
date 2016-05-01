@@ -543,7 +543,7 @@
 		//part 2.1.1
 		printf("1\n");
 		add_output(e_node,1,'R',current_pp->node);
-		printf("2\n");
+		printf("2 %p\n",current_pp->node);
 		struct node *left_u_node = connect_with_entry(e_node,gen_a_node(current_pp->node));
 		printf("2.1.1 done\n");
 		//part 2.1.2
