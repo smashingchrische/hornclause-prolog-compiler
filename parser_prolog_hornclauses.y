@@ -172,14 +172,13 @@
 		ptr->var = var_head;
 		ptr->next = 0;
 		ptr->prev = 0;
-		ptr->node = gen_node(type,0,0);
+		ptr->node = gen_node(type,0,var_head);
 		if (!pp_head){
 			pp_head = ptr;
 			pp_tail = ptr;
 		} else{
 			pp_tail->next = ptr;
 			ptr->prev = pp_tail;
-			pp_tail->node->vars = var_head;
 			pp_tail = ptr;
 		}
 	}
@@ -668,6 +667,7 @@
 			fprintf(output_stream,"%s,",vars->name);
 			vars = vars->next;
 		}
+		fprintf(output_stream,"\n");
 	}
 
 	/*void table_entry(int index, char type,struct output *out, char *info){
