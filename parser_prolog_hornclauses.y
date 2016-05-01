@@ -51,6 +51,7 @@
 	void gen_var_node(char *var_name);
 	void gen_partial_problem_node(char type, char *info);
 
+	struct variable *gen_var_from_char(char *info);
 	struct node *gen_node(char type, struct output *output, struct variable *vars);
 	void insert_node_before(struct node *current, struct node *new);
 	void insert_node_after(struct node *current, struct node *new);
