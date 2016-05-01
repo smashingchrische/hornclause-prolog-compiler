@@ -64,7 +64,7 @@
 	struct node *gen_absolute_dependency(struct node *left, struct node *right);
 	struct node *gen_g_independency(struct node *left, struct node *right, struct variable *vars);
 	struct node *gen_i_independency(struct node *left, struct node *right, struct variable *vars);
-	struct node *gen_g_i_independency(struct node *left, struct node *right, char *g_var, char *i_var);
+	struct node *gen_g_i_independency(struct node *left, struct node *right, struct variable *g_vars, struct variable *i_vars);
 	struct node *get_last_node(struct partial_problem *pp);
 
 	void add_variable(struct variable *current, char *new);
@@ -171,7 +171,7 @@
 		ptr->var = var_head;
 		ptr->next = 0;
 		ptr->prev = 0;
-		ptr->node = gen_node(type, 0, info);
+		ptr->node = gen_node(type, 0, gen_var_from_char(info));
 		if (!pp_head){
 			pp_head = ptr;
 			pp_tail = ptr;
@@ -180,6 +180,12 @@
 			ptr->prev = pp_tail;
 			pp_tail = ptr;
 		}
+	}
+	struct variable *gen_var_from_char(char *info) {
+		struct variable *var = malloc(sizeof(struct variable));
+		var->next = 0;
+		var->name = info;
+		return var;
 	}
 
 	struct node *gen_node(char type, struct output *output, struct variable *vars) {
@@ -294,7 +300,7 @@
 			right->vars = vars;
 			g_node = right;
 		} else {
-			g_node = gen_node('G',0,var);
+			g_node = gen_node('G',0,vars);
 			insert_node_after(left,g_node);
 			add_output(right,1,0,g_node);
 		}
@@ -320,7 +326,7 @@
 			right->vars = vars;
 			i_node = right;
 		} else {
-			i_node = gen_node('I',0,var);
+			i_node = gen_node('I',0,vars);
 			insert_node_after(left,i_node);
 			add_output(right,1,0,i_node);
 		}
@@ -567,7 +573,7 @@
 						left_problem = left_problem->prev;
 					}
 					if(absolute_independency) {
-						right_node = gen_a_node()
+						right_node = gen_a_node(right_node);
 					}
 					left_u_node = connect_with_entry(left_u_node,right_node);
 					current_pp = current_pp->next;
