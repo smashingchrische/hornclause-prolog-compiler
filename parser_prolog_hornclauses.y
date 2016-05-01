@@ -75,7 +75,7 @@
 	void print_table();
 	int print_table_entries(struct node *node,FILE *output_stream);
 
-	void schwinn();
+	void schwinn(struct partial_problem *current_pp);
 	int table_counter = 1;
 	%}
 	%union{
@@ -609,7 +609,7 @@
 		rewind(yyin);
 
 		yyparse();
-
+		schwinn();
 		print_table();
 
 		fclose(yyin);
