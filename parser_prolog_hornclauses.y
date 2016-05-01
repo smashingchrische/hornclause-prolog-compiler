@@ -48,12 +48,32 @@
 	};
 
 	void yyerror(char *message);
+
 	void gen_var_node(char *var_name);
 	void gen_partial_problem_node(char type, char *info);
-	void yyerror (char *message);
-	void print_the_lot();
-	void table_entry(int index, char type, struct output *out, char *info);
-	void table_writer(struct node *node);
+
+	struct node *gen_node(char type, struct output *output, char *info);
+	void insert_node_before(struct node *current, struct node *new);
+	void insert_node_after(struct node *current, struct node *new);
+
+	struct output *gen_output(int port, char type, struct node *target);
+	void insert_output(struct output *current, struct output *new);
+	void add_output(struct node *current, int port, char type, struct node *target);
+
+	struct node *gen_a_node(struct node *current);
+	struct node *connect_with_entry(struct node *left, struct node *right);
+	struct node *gen_absolute_dependency(struct node *left, struct node *right);
+	struct node *gen_g_independency(struct node *left, struct node *right, char *var);
+	struct node *gen_i_independency(struct node *left, struct node *right, char *var);
+	struct node *gen_g_i_independency(struct node *left, struct node *right, char *g_var, char *i_var);
+	struct node *get_last_node(struct partial_problem *pp);
+
+	void add_variable(struct variable *current, char *new);
+	struct dependency *check_dependency(struct partial_problem *entry, struct partial_problem *current, struct partial_problem *check);
+
+	void print_table();
+	int print_table_entries(int index, struct node *entry);
+
 	void schwinn();
 	int table_counter = 1;
 	%}
