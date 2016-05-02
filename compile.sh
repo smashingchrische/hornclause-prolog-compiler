@@ -13,6 +13,5 @@ echo '\t\t Done.'
 echo '\n Starting the programm...'
 echo '\n Reading the input_file.txt:'
 echo '\t\t Done.'
-echo '\n \n'
 ./myprolog.exe
 rm -f a.out lex.yy.c y.tab.c y.tab.h y.tab.h.gch

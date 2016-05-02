@@ -1,83 +1,18 @@
 
 This is not a Horn clause. Please start the program again
 
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
+This is not a Horn clause. Please start the program again
 
-	Problem Counter	|	Included Variables
-	0		|	X, R, L, X, S, 
+This is not a Horn clause. Please start the program again
 
-	1		|	R, L, S, 
+This is not a Horn clause. Please start the program again
 
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
+This is not a Horn clause. Please start the program again
 
-	Problem Counter	|	Included Variables
-	0		|	X, R, L, X, S, 
+This is not a Horn clause. Please start the program again
 
-	1		|	R, L, S, 
+This is not a Horn clause. Please start the program again
 
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
+This is not a Horn clause. Please start the program again
 
-	Problem Counter	|	Included Variables
-	0		|	
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
-
-	Problem Counter	|	Included Variables
-	0		|	X, R, L, X, S, 
-
-	1		|	R, L, S, 
-
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
-
-	Problem Counter	|	Included Variables
-	0		|	X, R, L, X, S, 
-
-	1		|	R, L, S, 
-
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
-
-	Problem Counter	|	Included Variables
-	0		|	X, R, L, X, S, 
-
-	1		|	R, L, S, 
-
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
-
-	Problem Counter	|	Included Variables
-	0		|	X, R, L, X, S, 
-
-	1		|	R, L, S, 
-
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
-
-	Problem Counter	|	Included Variables
-	0		|	X, R, L, X, S, 
-
-	1		|	R, L, S, 
-
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
-
-	Problem Counter	|	Included Variables
-	0		|	X, R, L, X, S, 
-
-	1		|	R, L, S, 
-
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
-
-	Problem Counter	|	Included Variables
-	0		|	X, R, L, X, S, 
-
-	1		|	R, L, S, 
-
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
-
-	Problem Counter	|	Included Variables
-	0		|	X, R, L, X, S, 
-
-	1		|	R, L, S, 
-
-Congrats. You seem to have a clue about Horn clauses. Line #1 is correct: 
-
-	Problem Counter	|	Included Variables
-	0		|	X, R, L, X, S, 
-
-	1		|	R, L, S, 
+This is not a Horn clause. Please start the program again

@@ -1,7 +1,6 @@
 %{
 	#include <stdio.h>
 	#include <string.h>
-	#include <stdlib.h>
 	#define CHUNK 1024 /*read 1024 bytes at a time */
 	#define ABSOLUTE_DEPENDENCY 1
 	#define G_INDEPENDENCY 2
@@ -174,7 +173,6 @@
 		ptr->next = 0;
 		ptr->prev = 0;
 		ptr->node = gen_node(type,0,var_head);
-		printf("Before if: HEAD: %p, PTR: %p\n",pp_head,ptr);
 		if (!pp_head){
 			pp_head = ptr;
 			pp_tail = ptr;
@@ -183,7 +181,6 @@
 			ptr->prev = pp_tail;
 			pp_tail = ptr;
 		}
-		struct partial_problem test = *pp_head;
 	}
 	struct variable *gen_var_from_char(char *info) {
 		struct variable *var = malloc(sizeof(struct variable));
@@ -609,22 +606,31 @@
 	}
 
 	int main(int argc, char **argv) {
+		printf("TEST\n");
 		extern FILE *yyin;
-
-		var_head = NULL;
-		var_tail = NULL;
-		pp_head = NULL;
-		pp_tail = NULL;
-
+		printf("After yyin");
+/*		size_t nread;
+		char *buf = malloc(CHUNK);
+*/
+		var_head = 0;
+		var_tail = 0;
+		pp_head = 0;
+		pp_tail = 0;
+		printf("Before fopen");
 		yyin = fopen("input_file.txt","r");
-
-		printf("BEFORE PARSE\n");	
-		yyparse();
+/*		nread = fread(buf, 1, CHUNK, yyin);
+		fwrite(buf, 1, nread, stdout);
+		rewind(yyin);
 		fclose(yyin);
-		printf("BEFORE SCHWINN %p\n",pp_head);
+		free(buf);
+*/	
+		printf("BEFORE PARSE");	
+		yyparse();
+		printf("BEFORE SCHWINN");
 		schwinn(pp_head);
-		printf("AFTER SCHWINN\n");
+		printf("AFTER SCHWINN");
 		print_table();
+		fclose(yyin);
 		return 0;
 	}
 	struct node *connect_and_number_nodes(struct partial_problem *pp) {
