@@ -1,7 +1,6 @@
 %{
 	#include <stdio.h>
 	#include <string.h>
-	#include <stdlib.h>
 	#define CHUNK 1024 /*read 1024 bytes at a time */
 	#define ABSOLUTE_DEPENDENCY 1
 	#define G_INDEPENDENCY 2
@@ -562,59 +561,59 @@
 		current_pp = current_pp->next;
 		//part 2.1.1
 		if(current_pp != 0) {
-		add_output(e_node,1,'R',current_pp->node);
-		struct node *left_u_node = connect_with_entry(e_node,gen_a_node(current_pp->node));
-		//part 2.1.2
-		current_pp = current_pp->next;
-		if(current_pp != 0) {
-			if(current_pp->node->type == 'U'){ //second partial problem
-				struct node *c_node = gen_node('C',0,0);
-				insert_node_after(current_pp->node,c_node);
-				add_output(c_node,1,0,e_node->out->target);
-				e_node->out->target = c_node;
-				while(current_pp != 0) {
-					if(current_pp->node->type == 'U') {
-					add_output(c_node,1,0,current_pp->node);
-					struct partial_problem *left_problem = current_pp->prev;
-					struct node *right_node = current_pp->node;
-					int absolute_independency = 1;
-					while(left_problem->node->type != 'E') {
-						struct dependency *depend = check_dependency(e_problem,current_pp,left_problem);
-						if(depend->type == ABSOLUTE_DEPENDENCY) {
-							right_node = gen_absolute_dependency(get_last_node(left_problem),right_node);
-							absolute_independency = 0;
-						} else if(depend->type == G_INDEPENDENCY) {
-							right_node = gen_g_independency(get_last_node(left_problem),right_node,depend->g_vars);
-							absolute_independency = 0;
-						} else if(depend->type == I_INDEPENDENCY) {
-							right_node = gen_i_independency(get_last_node(left_problem),right_node,depend->i_vars);
-							absolute_independency = 0;
-						} else if(depend->type == GI_INDEPENDENCY) {
-							right_node = gen_g_i_independency(get_last_node(left_problem),right_node,depend->g_vars,depend->i_vars);
-							absolute_independency = 0;
+			add_output(e_node,1,'R',current_pp->node);
+			struct node *left_u_node = connect_with_entry(e_node,gen_a_node(current_pp->node));
+			//part 2.1.2
+			current_pp = current_pp->next;
+			if(current_pp != 0) {
+				if(current_pp->node->type == 'U'){ //second partial problem
+					struct node *c_node = gen_node('C',0,0);
+					insert_node_after(current_pp->node,c_node);
+					add_output(c_node,1,0,e_node->out->target);
+					e_node->out->target = c_node;
+					while(current_pp != 0) {
+						if(current_pp->node->type == 'U') {
+						add_output(c_node,1,0,current_pp->node);
+						struct partial_problem *left_problem = current_pp->prev;
+						struct node *right_node = current_pp->node;
+						int absolute_independency = 1;
+						while(left_problem->node->type != 'E') {
+							struct dependency *depend = check_dependency(e_problem,current_pp,left_problem);
+							if(depend->type == ABSOLUTE_DEPENDENCY) {
+								right_node = gen_absolute_dependency(get_last_node(left_problem),right_node);
+								absolute_independency = 0;
+							} else if(depend->type == G_INDEPENDENCY) {
+								right_node = gen_g_independency(get_last_node(left_problem),right_node,depend->g_vars);
+								absolute_independency = 0;
+							} else if(depend->type == I_INDEPENDENCY) {
+								right_node = gen_i_independency(get_last_node(left_problem),right_node,depend->i_vars);
+								absolute_independency = 0;
+							} else if(depend->type == GI_INDEPENDENCY) {
+								right_node = gen_g_i_independency(get_last_node(left_problem),right_node,depend->g_vars,depend->i_vars);
+								absolute_independency = 0;
+							}
+							left_problem = left_problem->prev;
 						}
-						left_problem = left_problem->prev;
-					}
-					if(absolute_independency) {
-						right_node = gen_a_node(right_node);
-					}
-					left_u_node = connect_with_entry(left_u_node,right_node);
-					current_pp = current_pp->next;
-					} else {
-						break;
+						if(absolute_independency) {
+							right_node = gen_a_node(right_node);
+						}
+						left_u_node = connect_with_entry(left_u_node,right_node);
+						current_pp = current_pp->next;
+						} else {
+							break;
+						}
 					}
 				}
+
+				struct node *r_node = gen_node('R',0,0);
+				insert_node_after(left_u_node,r_node);
+				add_output(left_u_node,1,0,r_node);
+
+			} else {
+				struct node *r_node = gen_node('R',0,0);
+				insert_node_after(left_u_node,r_node);
+				add_output(left_u_node,1,0,r_node);
 			}
-
-			struct node *r_node = gen_node('R',0,0);
-			insert_node_after(left_u_node,r_node);
-			add_output(left_u_node,1,0,r_node);
-
-		} else {
-			struct node *r_node = gen_node('R',0,0);
-			insert_node_after(left_u_node,r_node);
-			add_output(left_u_node,1,0,r_node);
-		}
 		} else {
 			struct node *r_node = gen_node('R',0,0);
 			insert_node_after(e_node,r_node);
@@ -625,13 +624,13 @@
 	int main(int argc, char **argv) {
 		extern FILE *yyin;
 
-		var_head = NULL;
-		var_tail = NULL;
-		pp_head = NULL;
-		pp_tail = NULL;
+		var_head = 0;
+		var_tail = 0;
+		pp_head = 0;
+		pp_tail = 0;
 
 		yyin = fopen("input_file.txt","r");
-	
+
 		yyparse();
 		fclose(yyin);
 		printf("Starting Schwinn...\n");
