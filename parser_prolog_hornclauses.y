@@ -264,7 +264,11 @@
 			gen_a_node(right);
 		}
 		insert_node_after(left,u_node);
-		add_output(left,2,0,u_node);
+		if(left->type == 'E') {
+			add_output(left,2,'L',u_node);
+		} else {
+			add_output(left,2,0,u_node);
+		}
 		add_output(right,1,0,u_node);
 
 		return u_node;
@@ -273,6 +277,7 @@
 		if(left->type == 'A' && left->out != 0) {
 			struct node *c_node = gen_node('C',left->out,0);
 			left->out = gen_output(1,0,c_node);
+			insert_node_after(left,c_node);
 			left = c_node;
 		}
 
@@ -295,6 +300,7 @@
 		if(left->type == 'A' && left->out != 0) {
 			struct node *c_node = gen_node('C',left->out,0);
 			left->out = gen_output(1,0,c_node);
+			insert_node_after(left,c_node);
 			left = c_node;
 		}
 
@@ -321,6 +327,7 @@
 		if(left->type == 'A' && left->out != 0) {
 			struct node *c_node = gen_node('C',left->out,0);
 			left->out = gen_output(1,0,c_node);
+			insert_node_after(left,c_node);
 			left = c_node;
 		}
 
@@ -347,6 +354,7 @@
 		if(left->type == 'A' && left->out != 0) {
 			struct node *c_node = gen_node('C',left->out,0);
 			left->out = gen_output(1,0,c_node);
+			insert_node_after(left,c_node);
 			left = c_node;
 		}
 
@@ -405,6 +413,7 @@
 
 		//check for equals between current and check
 		while(current_var != 0) {
+			check_var = check->var;
 			while(check_var != 0) {
 				if(strcmp(current_var->name,check_var->name) == 0) {
 					if(check_equals == 0) {
@@ -425,6 +434,7 @@
 		struct variable *tmp_check_equals = check_equals;
 		while(tmp_check_equals != 0) {
 			found = 0;
+			entry_var = entry->var;
 			while(entry_var != 0) {
 				if(strcmp(entry_var->name,tmp_check_equals->name) == 0) {
 					found = 1;
@@ -447,10 +457,10 @@
 		}
 
 		//look for all that are in current but not in check
-		tmp_check_equals = check_equals;
 		current_var = current->var;
 		while(current_var != 0) {
 			found = 0;
+			tmp_check_equals = check_equals;
 			while(tmp_check_equals != 0) {
 				if(strcmp(current_var->name,tmp_check_equals->name) == 0) {
 					found = 1;
@@ -470,8 +480,8 @@
 		}
 
 		//check for I independency on current site and absolute independency
-		entry_var = entry->var;
 		while(current_different != 0) {
+			entry_var = entry->var;
 			while(entry_var != 0) {
 				if(strcmp(current_different->name,entry_var->name) == 0) {
 					if(depend->i_vars == 0) {
@@ -498,10 +508,10 @@
 
 		if(depend->type == GI_INDEPENDENCY || depend->type == I_INDEPENDENCY) {
 			//look for all that are in check but not in current
-			tmp_check_equals = check_equals;
 			check_var = check->var;
 			while(check_var != 0) {
 				found = 0;
+				tmp_check_equals = check_equals;
 				while(tmp_check_equals != 0) {
 					if(strcmp(check_var->name,tmp_check_equals->name) == 0) {
 						found = 1;
@@ -521,8 +531,8 @@
 			}
 
 			//check for i independency on check site
-			entry_var = entry->var;
 			while(check_different != 0) {
+				entry_var = entry->var;
 				while(entry_var != 0) {
 					if(strcmp(check_different->name,entry_var->name) == 0) {
 						if(depend->i_vars == 0) {
@@ -551,6 +561,7 @@
 		struct node *e_node = e_problem->node;
 		current_pp = current_pp->next;
 		//part 2.1.1
+		if(current_pp != 0) {
 		add_output(e_node,1,'R',current_pp->node);
 		struct node *left_u_node = connect_with_entry(e_node,gen_a_node(current_pp->node));
 		//part 2.1.2
@@ -601,7 +612,13 @@
 
 		} else {
 			struct node *r_node = gen_node('R',0,0);
+			insert_node_after(left_u_node,r_node);
 			add_output(left_u_node,1,0,r_node);
+		}
+		} else {
+			struct node *r_node = gen_node('R',0,0);
+			insert_node_after(e_node,r_node);
+			add_output(e_node,1,0,r_node);
 		}
 	}
 

@@ -1,1 +1,1 @@
-person(X):-dude(X),man(X).
+p(A,B,C,D):-q(A,B),r(A,C),s(B,D),t(C,D).
