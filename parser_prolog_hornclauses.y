@@ -174,7 +174,6 @@
 		ptr->next = 0;
 		ptr->prev = 0;
 		ptr->node = gen_node(type,0,var_head);
-		printf("Before if: HEAD: %p, PTR: %p\n",pp_head,ptr);
 		if (!pp_head){
 			pp_head = ptr;
 			pp_tail = ptr;
@@ -183,7 +182,6 @@
 			ptr->prev = pp_tail;
 			pp_tail = ptr;
 		}
-		struct partial_problem test = *pp_head;
 	}
 	struct variable *gen_var_from_char(char *info) {
 		struct variable *var = malloc(sizeof(struct variable));
@@ -210,7 +208,9 @@
 	}
 	void insert_node_after(struct node *current, struct node *new) {
 		new->next = current->next;
-		current->next->prev = new;
+		if(current->next != 0) {
+			current->next->prev = new;
+		}
 		new->prev = current;
 		current->next = new;
 	}
@@ -246,11 +246,8 @@
 			return current;
 		} else {
 			struct node *a_node = gen_node('A',0,0);
-			printf("2.1");
 			insert_node_after(current,a_node);
-			printf("2.2");
 			add_output(current,1,0,a_node);
-			printf("2.3");
 			return a_node;
 		}
 	}
@@ -378,7 +375,7 @@
 	}
 	struct node *get_last_node(struct partial_problem *pp) {
 		struct node *last_node = pp->node;
-		while(last_node != 0) {
+		while(last_node->next != 0) {
 			last_node = last_node->next;
 		}
 		return last_node;
@@ -550,16 +547,12 @@
 	}
 
 	void schwinn(struct partial_problem *current_pp) {
-		printf("In Schwinn");
 		struct partial_problem *e_problem = current_pp;
 		struct node *e_node = e_problem->node;
 		current_pp = current_pp->next;
-		printf("Before 2.1.1");
 		//part 2.1.1
 		add_output(e_node,1,'R',current_pp->node);
-		printf("Before fuckup");
 		struct node *left_u_node = connect_with_entry(e_node,gen_a_node(current_pp->node));
-		printf("After fuckup");
 		//part 2.1.2
 		current_pp = current_pp->next;
 		if(current_pp != 0) {
@@ -568,7 +561,8 @@
 				insert_node_after(current_pp->node,c_node);
 				add_output(c_node,1,0,e_node->out->target);
 				e_node->out->target = c_node;
-				while(current_pp->node->type == 'U') {
+				while(current_pp != 0) {
+					if(current_pp->node->type == 'U') {
 					add_output(c_node,1,0,current_pp->node);
 					struct partial_problem *left_problem = current_pp->prev;
 					struct node *right_node = current_pp->node;
@@ -595,6 +589,9 @@
 					}
 					left_u_node = connect_with_entry(left_u_node,right_node);
 					current_pp = current_pp->next;
+					} else {
+						break;
+					}
 				}
 			}
 
@@ -617,14 +614,14 @@
 		pp_tail = NULL;
 
 		yyin = fopen("input_file.txt","r");
-
-		printf("BEFORE PARSE\n");	
+	
 		yyparse();
 		fclose(yyin);
-		printf("BEFORE SCHWINN %p\n",pp_head);
+		printf("Starting Schwinn...\n");
 		schwinn(pp_head);
-		printf("AFTER SCHWINN\n");
+		printf("Printing Node-Table...\n");
 		print_table();
+		printf("Success. Terminating...\n");
 		return 0;
 	}
 	struct node *connect_and_number_nodes(struct partial_problem *pp) {
@@ -683,11 +680,5 @@
 	}
 
 	void yyerror (char *message){
-		extern FILE *yyout;
-		yyout = fopen("output_file.txt", "a+");
-
 		printf("\nThis is not a Horn clause. Please start the program again\n");
-		fprintf(yyout,"\nThis is not a Horn clause. Please start the program again\n");
-
-		fclose(yyout);
 	}

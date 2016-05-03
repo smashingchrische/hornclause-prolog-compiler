@@ -7,7 +7,7 @@ bison -dy parser_prolog_hornclauses.y
 echo '\t\t Done.'
 
 echo '\n Compiling...'
-gcc y.tab.c lex.yy.c -lfl -lm -o myprolog.exe
+gcc y.tab.c lex.yy.c -lfl -lm -g -o myprolog.exe
 echo '\t\t Done.'
 
 echo '\n Starting the programm...'
