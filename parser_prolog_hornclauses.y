@@ -287,7 +287,7 @@
 			u_node = right;
 		} else {
 			u_node = gen_node('U',0,0);
-			insert_node_after(left,u_node);
+			insert_node_after(right,u_node);
 			add_output(left,1,0,u_node);
 			add_output(right,2,0,u_node);
 		}
@@ -310,7 +310,7 @@
 			g_node = right;
 		} else {
 			g_node = gen_node('G',0,vars);
-			insert_node_after(left,g_node);
+			insert_node_after(right,g_node);
 			add_output(right,1,0,g_node);
 		}
 		struct node *u_node = gen_node('U',0,0);
@@ -337,7 +337,7 @@
 			i_node = right;
 		} else {
 			i_node = gen_node('I',0,vars);
-			insert_node_after(left,i_node);
+			insert_node_after(right,i_node);
 			add_output(right,1,0,i_node);
 		}
 		struct node *u_node = gen_node('U',0,0);
@@ -364,7 +364,7 @@
 			g_node = right;
 		} else {
 			g_node = gen_node('G',0,g_vars);
-			insert_node_after(left,g_node);
+			insert_node_after(right,g_node);
 			add_output(right,1,0,g_node);
 		}
 		struct node *u_node = gen_node('U',0,0);
@@ -568,10 +568,11 @@
 			if(current_pp != 0) {
 				if(current_pp->node->type == 'U'){ //second partial problem
 					struct node *c_node = gen_node('C',0,0);
-					insert_node_after(current_pp->node,c_node);
+					insert_node_after(e_node,c_node);
 					add_output(c_node,1,0,e_node->out->target);
 					e_node->out->target = c_node;
 					while(current_pp != 0) {
+						printf("In Loop");
 						if(current_pp->node->type == 'U') {
 						add_output(c_node,1,0,current_pp->node);
 						struct partial_problem *left_problem = current_pp->prev;
