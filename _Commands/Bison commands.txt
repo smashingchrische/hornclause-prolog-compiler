@@ -1,0 +1,11 @@
+CALL bison file creator:
+
+	bison -d -b y rapid.y
+
+bison options <letter at the end of file name> filename.<letter at the end of file>
+
+CALL C compiler:
+
+	gcc y.tab.c lex.yy.c -lfl -lm -o <targetfilename>
+
+
