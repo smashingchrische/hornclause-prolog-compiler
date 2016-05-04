@@ -1,1 +1,1 @@
-conc([X|R],L,[X|S]):-conc(R,L,S).
+p(A,B,C,D):-q(A,B),r(A,C),s(B,D),t(C,D).
